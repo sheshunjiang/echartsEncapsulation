@@ -428,7 +428,7 @@ option={
 	visualMapColor: ['#50a3ba', '#eac736', '#d94e5d'],   //颜色取值
 	symbol:'',                                         //设置标记的样式，其值可以为'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'，也可以为图片，通过'image://url' 设置为图片；也可以通过 'path://' 将图标设置为任意的矢量路径
 	symbolSize:function (val){return val[2]/10;}, //标记的大小，可以是固定大小的数字如10.也可以是函数动态设置标记大小,也可以用数组分开表示宽和高，例如 [20, 10]
-	scatterSeriesData:convertData(data);
+	scatterSeriesData:convertData(data),
 	effectScatterSeriesData:pointData      //数据
 
 };
@@ -497,8 +497,7 @@ function DropMapEffectScatterAndScatter(ele,mapName,geoJsonData,option,callback)
 	            type: 'scatter',
 	            coordinateSystem: 'geo',
 	            data: option.scatterSeriesData,
-	            symbolSize: option.symbolSize
-	        	},
+	            symbolSize: option.symbolSize,
 	            label: {
 	                normal: {
 	                    formatter: '{b}',

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>行政区域切换</title>
+	<script type="text/javascript" src="../mapdata/china.json"></script>
+	<!-- <script type="text/javascript" src="../mapdata/geometryProvince/51.json"></script>
+	<script type="text/javascript" src="../mapdata/geometryCouties/510100.json"></script> -->
+	<script type="text/javascript" src="../js/echarts.js"></script>
+	<script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
+	<!-- <script type="text/javascript" src="../js/script.js"></script> -->
+	<style type="text/css">
+		
+	</style>
+</head>
+<body>
+	<div id="main" style="width: 800px; height: 600px;"></div>
+	<button id="button">上一级</button>
+</body>
+<!-- 依赖百度echarts.js -->
+	<script type="text/javascript">
+		//var geoData={};    //地图数据
+		//geoData=luzhou;
+
+		var chinaData=china;
+		var ele=document.getElementById("main");
+
+		var option={
+			backgroundColor:"#ffffff",
+			center:'',
+			visualMapColor:['#50a3ba', '#eac736', '#d94e5d'],
+			seriesData:eachGeoJson(chinaData)
+		};
+		console.log(echarts);
+		//var mapEcharts=new mapEcharts(ele,echarts);
+		// var mapEcharts=new mapEcharts(ele);
+		// mapEcharts.DropMapGeo(ele,"china",chinaData,option,function(params){
+		// 	var sichuanData={};
+		// 	//获取对应的地图数据
+		// 	$.getJSON('../mapdata/geometryProvince/'+params.data.id+'.json',function(data){
+		// 		sichuanData=data;
+		// 		option.seriesData=eachGeoJson(sichuanData);
+		// 		option.center=option.seriesData.cp;
+		// 		mapEcharts.DropMapGeo(ele,"sichuan",sichuanData,option,function(params){
+		// 			var chengduData={};
+		// 			console.log('../mapdata/geometryCouties/'+params.data.id+'00.json');
+		// 			$.getJSON('../mapdata/geometryCouties/'+params.data.id+'00.json',function(data){
+		// 				chengduData=data;
+		// 				option.seriesData=eachGeoJson(chengduData);
+		// 				option.center=option.seriesData.cp;
+		// 				mapEcharts.DropMapGeo(ele,"chengdu",chengduData,option);
+		// 			});
+		// 		});
+		// 	})
+		// });
+
+		// function DropMapGeo(ele,mapName,geoJsonData,option,callback){
+		// 	var regionName=mapName;
+		// 	echarts.registerMap(regionName,geoJsonData);
+		// 	var chart=echarts.init(ele);
+		// 	var options;
+		// 	options={
+		// 		backgroundColor: option.backgroundColor? option.backgroundColor:"#ffffff",
+		// 		visualMap: {
+		// 			show:false,
+		// 			min: 0,
+		// 			max: 200,
+		// 			calculable: true,
+		// 			inRange: {
+		// 				color: option.visualMapColor
+		// 			},
+		// 			textStyle: {
+		// 				color: '#fff'
+		// 			}
+		// 		},
+		// 		geo: {
+		// 			map: regionName,
+		// 			center:option.center,
+		// 		    roam:true,   //可以缩放地图
+		// 		    label: {
+		// 		      	show:true
+		// 		    },
+		// 		    itemStyle: {
+		// 		      	normal: {
+		// 		       		areaColor: '#dddddd',
+		// 		       		borderColor: '#111'
+		// 		       	},
+		// 		       	emphasis: {
+		// 		       		areaColor: '#f2eca6'
+		// 		       	}
+		// 		    }
+		// 		},
+		// 		series:[
+		// 			{
+	 //                    //name : "rinima"
+	 //                    type : "map",
+	 //                    geoIndex:0,
+	 //                    coordinateSystem:'geo',
+	 //                    map : regionName,
+	 //                    zoom:1.1,
+	 //                    roam : true,
+	 //                    label:{
+	 //                            normal:{
+	 //                                show:true
+	 //                            }
+	 //                        },
+	 //                    coordinateSystem:'geo',
+	 //                    data : option.seriesData
+
+	 //                }
+		// 		]
+
+		// 	};
+		// 	chart.setOption(options);
+		// 	chart.on('click',function(params){
+		// 		if(callback){
+		// 			chart.dispose();
+		// 			callback(params);
+		// 		}
+		// 	});
+		// }
+
+
+		// 此对象依赖于echerts.js,地图GeoJson
+function mapEcharts(ele,echartsa){
+	this.ele=ele;
+	this.echart=echartsa;
+}
+
+mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
+	var ele=this.ele;
+	var echart=this.echart;
+	var regionName=mapName;
+	echart.registerMap(regionName,geoJsonData);
+	var chart=echart.init(ele);
+	var options;
+	options={
+		backgroundColor: option.backgroundColor? option.backgroundColor:"#ffffff",
+		visualMap: {
+			show:false,
+			min: 0,
+			max: 200,
+			calculable: true,
+			inRange: {
+				color: option.visualMapColor?option.visualMapColor:['#50a3ba', '#eac736', '#d94e5d']
+			},
+			textStyle: {
+				color: '#fff'
+			}
+		},
+		geo: {
+			map: regionName,
+			center:option.center,
+		    roam:true,   //可以缩放地图
+		    label: {
+		      	show:true
+		    },
+		    itemStyle: {
+		      	normal: {
+		       		areaColor: '#dddddd',
+		       		borderColor: '#111'
+		       	},
+		       	emphasis: {
+		       		areaColor: '#f2eca6'
+		       	}
+		    }
+		},
+		series:[
+			{
+                type : "map",
+                geoIndex:0,
+                coordinateSystem:'geo',
+                map : regionName,
+                zoom:1.1,
+                roam : true,
+                label:{
+                        normal:{
+                            show:true
+                        }
+                    },
+                coordinateSystem:'geo',
+                data : option.seriesData
+
+            }
+		]
+
+	};
+	chart.setOption(options);
+	chart.on('click',function(params){
+		if(callback){
+			chart.dispose();
+			callback(params);
+		}
+	});
+}
+
+var aa=new mapEcharts(ele,echarts);
+aa.DropMapGeo(ele,"china",chinaData,option);
+
+	//遍历geo数据
+	function eachGeoJson(geoJson){
+		var data=[];
+		for(var i=0;i<geoJson.features.length;++i){
+			data.push({
+				"id":geoJson.features[i].properties.id,
+				"name":geoJson.features[i].properties.name,
+				"cp":geoJson.features[i].properties.cp,
+				"value":0
+			}); 
+		}
+		return data;
+	}
+
+	</script>
+</html>
