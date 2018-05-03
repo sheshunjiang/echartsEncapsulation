@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>行政区域地图绘制封装(背景色统一)</title>
+	<script type="text/javascript" src="../mapdata/geometryCouties/510500.json"></script>
+	<script type="text/javascript" src="../js/echarts.js"></script>
+	<script type="text/javascript" src="script.js"></script>
+</head>
+<body>
+	<div id="main" style="width: 800px; height: 600px;"></div>
+</body>
+	<!-- 依赖百度echarts.js -->
+	<script type="text/javascript">
+		var geoData={};    //地图数据
+		geoData=luzhou;
+		var ele=document.getElementById("main");
+		DropMapGeo(ele,"luzhou",geoData);
+	</script>
+</html>

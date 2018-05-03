@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>行政区域地图绘制封装(背景色统一)</title>
+	<script type="text/javascript" src="../mapdata/geometryCouties/510500.json"></script>
+	<script type="text/javascript" src="../js/echarts.js"></script>
+	<script type="text/javascript" src="script.js"></script>
+</head>
+<body>
+	<div id="main" style="width: 800px; height: 600px;"></div>
+</body>
+	<!-- 依赖百度echarts.js -->
+	<script type="text/javascript">
+		var geoData={};    //地图数据
+		geoData=luzhou;
+		var ele=document.getElementById("main");
+		var colorArr=[{name: "泸县", value: 4},{name: "龙马潭区", value: 18},{name: "江阳区", value: 24},{name: "合江县", value: 9},{name: "纳溪区", value: 10},{name: "叙永县", value: 21},{name: "古蔺县", value: 30}];
+		DropMap(ele,"luzhou",geoData,colorArr);
+	</script>
+</html>
