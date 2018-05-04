@@ -12,7 +12,8 @@ var server = http.createServer(function(req,res){
      //客户端输入的url，例如如果输入localhost:8888/index.html，那么这里的url == /index.html 
      //url.parse()方法将一个URL字符串转换成对象并返回，通过pathname来访问此url的地址。
 
-    var realPath = path.join('D:/myFile/echarts封装/echartsEncapsulation/html',pathname);
+    // var realPath = path.join('D:/myFile/echarts封装/echartsEncapsulation/html',pathname);
+    var realPath = path.join('D:/myFile/echarts封装/echartsEncapsulation/',pathname);
     //完整的url路径
     console.log(realPath);  
     // F:/nodejs/nodetest/index.html
