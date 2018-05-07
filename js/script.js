@@ -39,7 +39,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 		    },
 		    itemStyle: {
 		      	normal: {
-		       		areaColor: '#dddddd',
+		       		areaColor: '#00CED1',
 		       		borderColor: '#111'
 		       	},
 		       	emphasis: {
@@ -49,6 +49,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 		},
 		series:[
 			{
+				name:regionName,
                 type : "map",
                 geoIndex:0,
                 coordinateSystem:'geo',
@@ -64,7 +65,8 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
                 data : option.seriesData
 
             }
-		]
+		],
+		animation:true
 
 	};
 	chart.setOption(options);
@@ -76,6 +78,46 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 			callback(params);
 		}
 	});
+	// chart.dispatchAction({
+	// 	type: 'geoSelect',          //选中指定的地图区域。
+	//     type: 'geoUnSelect',        //取消选中指定的地图区域。
+	//     type: 'geoToggleSelect',    //切换指定的地图区域选中状态。
+	// });
+
+	// chart.dispatchAction({
+	//     type: 'mapSelect',          //选中指定的地图区域。
+	//     type: 'mapUnSelect',        //取消选中指定的地图区域。
+	//     type: 'mapToggleSelect',    //切换指定的地图区域选中状态。
+	//     seriesIndex: 1,  // 可选，系列 index，可以是一个数组指定多个系列
+	//     seriesName: 1,   // 可选，系列名称，可以是一个数组指定多个系列
+	//     dataIndex: 1,          // 数据的 index，如果不指定也可以通过 name 属性根据名称指定数据
+	//     //name: string                 // 可选，数据名称，在有 dataIndex 的时候忽略
+	// });
+
+	// chart.on('geoselectchanged',function(params){
+	// 	console.log(params);
+	// });
+	// chart.on('mapselectchanged',function(params){
+	// 	console.log(params);
+	// });
+	// chart.on('dblclick',function(params){
+	// 	console.log(params);
+	// });
+	
+}
+
+//设置地图块的颜色
+mapEcharts.prototype.setMapColor=function(params,color){
+	var option=this.chart.getOption();
+	console.log(params);
+	console.log(color);
+	for(var i=0; i<option.series.length;i++){
+		if(option.series[i].type==params.seriesType && params.seriesType=="map" && option.series[i].name==params.seriesName){
+			option.series[i].data[params.dataIndex].itemStyle.color="#"+color;
+		}
+	}
+	console.log(option);
+	this.chart.setOption(option);
 }
 
 //地图上绘制线条
@@ -84,14 +126,13 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 //lineOption:线条的参数
 mapEcharts.prototype.setDropLines=function(lineName,linesData,lineOption){
 	var linesArr=[];
-	var markPointData=[];
-	var trajectoryLine=[];  //轨迹线用于返回参数
+	var markPointData=[]; 
+	var trajectoryLine=[];   //轨迹线数组对象用于返回参数
 	for(var i=0;i<linesData.length;i++){
 		markPointData.push({
 			"name":linesData[i].name,
 			"coord":linesData[i].coordinate
 		});
-		trajectoryLine.push(linesData[i].coordinate);
 		if(i==linesData.length-1){
 			break;
 		}
@@ -106,8 +147,13 @@ mapEcharts.prototype.setDropLines=function(lineName,linesData,lineOption){
 				}
 			}
 		);
+		trajectoryLine.push({
+			seriesName:lineName,
+			seriesType:"lines",
+			data:linesArr[i],
+			dataIndex:i
+		});
 	}
-	//console.log(linesArr);
 	var option=this.chart.getOption();
 	option.series.push(
 		{
@@ -134,10 +180,16 @@ mapEcharts.prototype.setDropLines=function(lineName,linesData,lineOption){
 //isStartUp:是否启用动画，true开启动画，false关闭动画
 mapEcharts.prototype.setLineAnimation=function(trajectoryLine,lineAnimationOption,isStartUp){
 	var option=this.chart.getOption();
-	console.log(trajectoryLine);
+	var coordsArr=[];
+	for(var i=0;i<trajectoryLine.length;i++){
+		coordsArr.push(trajectoryLine[i].data.coords[0]);
+		if(i==trajectoryLine.length-1){
+			coordsArr.push(trajectoryLine[i].data.coords[1]);
+		}
+	}
 	option.series.push(	
 		{
-	        //name: item[0] + ' Top10',
+	        name: trajectoryLine.seriesName + 'Animation',
 	        type: 'lines',
 	        polyline:true,
 	        zlevel: 1,
@@ -154,76 +206,165 @@ mapEcharts.prototype.setLineAnimation=function(trajectoryLine,lineAnimationOptio
 	        },
 	        lineStyle: {
 	            normal: {
-	                //color: color[i],
 	                width: 0,
 	                opacity:0.6
 	            }
 	        },
 	        data: [
-	        	{coords:trajectoryLine}
+	        	{coords:coordsArr}
 	        ]
 	    }
 	);
 	this.chart.setOption(option);
-	console.log(this.chart.getOption());
 }
 
 //设置线的颜色
-mapEcharts.prototype.setLineColor=function(params){
+mapEcharts.prototype.setLineColor=function(line,lineStyle){
 	var option=this.chart.getOption();
+	//console.log(option);
 	for(var i=0;i<option.series.length;i++){
-		if(option.series[i].name==params.seriesName){ 
-			option.series[i].data[params.dataIndex].lineStyle.color="#a6c84c";
+		if(option.series[i].name==line.seriesName && option.series[i].type=='lines'){
+			if(lineStyle.color){
+				option.series[i].data[line.dataIndex].lineStyle.color= lineStyle.color;
+			}
+			if(lineStyle.width){
+				option.series[i].data[line.dataIndex].lineStyle.width=lineStyle.width;
+			}
+			if(lineStyle.type){
+				option.series[i].data[line.dataIndex].lineStyle.type=lineStyle.type;
+			}
+			if(lineStyle.opacity){
+				option.series[i].data[line.dataIndex].lineStyle.opacity=lineStyle.opacity;
+			} 
 			break;
 		}
 	}
 	this.chart.setOption(option);
-	//console.log(option);
 }
 
 //地图上绘制点
-//spotOption={}
-mapEcharts.prototype.setDropSpot=function(spotsName,spotData,marker){
+mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
 	var option=this.chart.getOption();
 	var seriesData=[];
+	var itemSeries=[];
 	for(var i=0;i<spotData.length;i++){
 		seriesData.push(
-		{
-			"name":spotData[i].text,
-			"value":spotData[i].coordinate
-		}
+			{
+				"name":spotData[i].text,
+				"value":spotData[i].coordinate,
+				"itemStyle":{
+					"color":spotOption? spotOption.color : '#ddd',
+					"borderColor":spotOption? spotOption.borderColor : '#ddd',
+					"borderWidth":spotOption? spotOption.borderWidth : 1,
+					"borderType":spotOption? spotOption.borderType : "solid",
+					"opacity":spotOption? spotOption.opacity : 1
+				},
+				"symbol":spotOption? spotOption.symbol : 'circle',
+				"symbolSize":spotOption? spotOption.symbolSize : 10,
+				"symbolOffset":spotOption? spotOption.symbolOffset : [0,0],
+				"label":{
+					"show":true,
+					"color":"#000",
+					"formatter":"{b}",
+					"fontSize":12,
+					"offset":[0,-15]
+				}
+			}
 		);
+		itemSeries.push({
+			seriesName: spotsName,
+        	seriesType: 'scatter',
+        	data: seriesData[i],
+        	dataIndex:i
+		});
 	}
-	option.series.push(
-		{
-			name: spotsName,
-            type: 'scatter',
-            coordinateSystem: 'geo',
-            data: seriesData,
-			symbol:"circle",
-            symbolSize: 12,
-            label: {
-                normal: {
-                    show: false
-                },
-                emphasis: {
-                    show: false
-                }
+	option.series.push({
+		name: spotsName,
+        type: 'scatter',
+        coordinateSystem: 'geo',
+        data: seriesData,
+		symbol:"circle",
+        symbolSize: 12,
+        hoverAnimation:false,
+        label: {
+            normal: {
+                show: true
             },
-            itemStyle: {
-                emphasis: {
-                    borderColor: '#fff',
-                    borderWidth: 1
-                }
+            emphasis: {
+                show: false
             }
+        }
+	});
+	this.chart.setOption(option);
+	return itemSeries;
+}
+
+//设置标记点的图标文字
+mapEcharts.prototype.setSpotText=function(params,text,textOption){
+	var option=this.chart.getOption();
+	for(var i=0;i<option.series.length;i++){
+		if(option.series[i].name==params.seriesName && params.seriesType=="scatter"){ 
+			option.series[i].data[params.dataIndex].name=text;
+			if(textOption.color){
+				option.series[i].data[params.dataIndex].label.color=textOption.color;
+			}
+			if(textOption.fontSize){
+				option.series[i].data[params.dataIndex].label.fontSize=textOption.fontSize;
+			}
+			if(textOption.offset){
+				option.series[i].data[params.dataIndex].label.offset=textOption.offset;
+			}
+			break;
 		}
-	);
+	}
+	this.chart.setOption(option);
+}
+
+
+//设置标记点的图片或图标类型
+mapEcharts.prototype.setSoptImg=function(params,imgOption){
+	var option=this.chart.getOption();
+	for(var i=0;i<option.series.length;i++){
+		if(option.series[i].name==params.seriesName && params.seriesType=="scatter"){
+			if(imgOption.symbol){
+				option.series[i].data[params.dataIndex].symbol=imgOption.symbol;
+			}
+			if(imgOption.symbolSize){
+				option.series[i].data[params.dataIndex].symbolSize=imgOption.symbolSize;
+			}
+			if(imgOption.color){
+				option.series[i].data[params.dataIndex].itemStyle.color=imgOption.color;
+			}
+			break;
+		}
+	}
+	this.chart.setOption(option);
+}
+
+//清除点
+mapEcharts.prototype.clearSpot=function(params){
+	var option=this.chart.getOption();
+	for(var i=0;i<option.series.length;i++){
+		if(option.series[i].name==params.seriesName && params.seriesType=="scatter"){
+			option.series[i].data.splice(params.dataIndex,1);
+			break;
+		}
+	}
 	this.chart.setOption(option);
 }
 
 //监听事件
 mapEcharts.prototype.linster=function(eventName,callback){
      this.chart.on(eventName,function(params){
-        callback(params);
+     	var param={};
+     	if(params.seriesType=="scatter"){
+     		param.data=params.data;
+     		param.seriesName=params.seriesName;
+     		param.seriesType="scatter";
+     		param.dataIndex=params.dataIndex;
+     	}else{
+     		param=params;
+     	}
+        callback(param);
      });
 }
