@@ -3,6 +3,7 @@ function mapEcharts(ele,echarts){
 	this.ele=ele;
 	this.echarts=echarts;
 	this.chart;
+	this.count=0;
 }
 
 mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
@@ -10,6 +11,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 	var echarts=this.echarts;
 	var regionName=mapName;
 	var chart=this.chart;
+	this.count++;
 	if(chart){
 		chart.dispose();
 	}
@@ -34,6 +36,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 			map: regionName,
 			center:option.center,
 		    roam:true,   //可以缩放地图
+		    //selectedMode:'single',
 		    label: {
 		      	show:true
 		    },
@@ -70,14 +73,19 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 
 	};
 	chart.setOption(options);
+	//console.log(echarts.getMap());
 	this.chart=chart;
-	chart.on('click',function(params){
-		if(callback){
-			//chart.dispose();
-			chart.showLoading();
-			callback(params);
-		}
-	});
+	if(callback){
+		callback();
+	}
+	return this;
+	// chart.on('click',function(params){
+	// 	if(callback){
+	// 		//chart.dispose();
+	// 		chart.showLoading();
+	// 		callback(params);
+	// 	}
+	// });
 	// chart.dispatchAction({
 	// 	type: 'geoSelect',          //选中指定的地图区域。
 	//     type: 'geoUnSelect',        //取消选中指定的地图区域。
@@ -100,23 +108,26 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 	// chart.on('mapselectchanged',function(params){
 	// 	console.log(params);
 	// });
-	// chart.on('dblclick',function(params){
-	// 	console.log(params);
-	// });
-	
 }
 
 //设置地图块的颜色
+// params:{   //选中地图区域对象
+// 	"data":{"name":"四川","value":0,"id":51,"itemStyle":{"color":"#00ced1"},"cp":[101.9199, 30.1904]},
+// 	dataIndex:4,
+// 	"name":"四川省",
+// 	"value":0,
+// 	"color":"#00ced1",
+// 	"seriesName":"china",
+// 	"seriesType":"map"
+// }
+//color:颜色
 mapEcharts.prototype.setMapColor=function(params,color){
 	var option=this.chart.getOption();
-	console.log(params);
-	console.log(color);
 	for(var i=0; i<option.series.length;i++){
 		if(option.series[i].type==params.seriesType && params.seriesType=="map" && option.series[i].name==params.seriesName){
-			option.series[i].data[params.dataIndex].itemStyle.color="#"+color;
+			option.series[i].data[params.dataIndex].itemStyle.color=color;
 		}
 	}
-	console.log(option);
 	this.chart.setOption(option);
 }
 
@@ -189,10 +200,10 @@ mapEcharts.prototype.setLineAnimation=function(trajectoryLine,lineAnimationOptio
 	}
 	option.series.push(	
 		{
-	        name: trajectoryLine.seriesName + 'Animation',
+	        name: trajectoryLine[0].seriesName + 'Animation',
 	        type: 'lines',
 	        polyline:true,
-	        zlevel: 1,
+	        zlevel: Math.round(Math.random()*100),
 	        effect: {
 	            show: isStartUp,
 	            period: lineAnimationOption ? lineAnimationOption.period : 6,
@@ -254,9 +265,9 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
 				"value":spotData[i].coordinate,
 				"itemStyle":{
 					"color":spotOption? spotOption.color : '#ddd',
-					"borderColor":spotOption? spotOption.borderColor : '#ddd',
-					"borderWidth":spotOption? spotOption.borderWidth : 1,
-					"borderType":spotOption? spotOption.borderType : "solid",
+					// "borderColor":spotOption? spotOption.borderColor : '#ddd',
+					// "borderWidth":spotOption? spotOption.borderWidth : 1,
+					// "borderType":spotOption? spotOption.borderType : "solid",
 					"opacity":spotOption? spotOption.opacity : 1
 				},
 				"symbol":spotOption? spotOption.symbol : 'circle',
@@ -285,6 +296,7 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
         data: seriesData,
 		symbol:"circle",
         symbolSize: 12,
+        zlevel:1000,
         hoverAnimation:false,
         label: {
             normal: {
@@ -296,6 +308,7 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
         }
 	});
 	this.chart.setOption(option);
+	console.log(this.chart.getOption());
 	return itemSeries;
 }
 
@@ -355,6 +368,7 @@ mapEcharts.prototype.clearSpot=function(params){
 
 //监听事件
 mapEcharts.prototype.linster=function(eventName,callback){
+     var echarts=this.echarts;
      this.chart.on(eventName,function(params){
      	var param={};
      	if(params.seriesType=="scatter"){
@@ -362,7 +376,13 @@ mapEcharts.prototype.linster=function(eventName,callback){
      		param.seriesName=params.seriesName;
      		param.seriesType="scatter";
      		param.dataIndex=params.dataIndex;
-     	}else{
+     	}else if(params.seriesType=="lines"){
+     		param.data=params.data;
+     		param.seriesName=params.seriesName;
+     		param.seriesType="lines";
+     		param.dataIndex=params.dataIndex;
+     	}
+     	else{
      		param=params;
      	}
         callback(param);

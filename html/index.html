@@ -4,17 +4,16 @@
 	<meta charset="utf-8">
 	<title>行政区域切换</title>
 	<script type="text/javascript" src="../mapdata/china.json"></script>
-	<!-- <script type="text/javascript" src="../mapdata/geometryProvince/51.json"></script>
-	<script type="text/javascript" src="../mapdata/geometryCouties/510100.json"></script> -->
 	<script type="text/javascript" src="../js/echarts.js"></script>
 	<script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="../js/script.js"></script>
-	<script type="text/javascript" src="../js/jscolor.js"></script>
+	<!-- <script type="text/javascript" src="../js/jscolor.js"></script> -->
 	<style type="text/css">
 		.warp{position: relative;}
 		#button{display: block;}
-		.changeColor{width:300px; height: 140px; border: 1px solid #ddd; display: none; position: absolute; top: 350px; left: 250px; z-index: 999;
+		.changeColor{width:300px; border: 1px solid #ddd; display: none; position: absolute; top: 350px; left: 250px; z-index: 999;
 			background:#AFEEEE;}
+		label{display: inline-block; width: 80px; margin-left: 10px;}
 		.button{margin-top: 10px;}
 		.button button{display: inline-block;}
 	</style>
@@ -24,9 +23,16 @@
 		<div id="main" style="width: 800px; height: 600px;"></div>
 		<button id="button">上一级</button>
 		<div class="changeColor" id="changeColor">
-			<h2>设置选中地图颜色</h2>
-			<label>选择颜色</label>
-			<input class="jscolor" name="ab2567" /><br/>
+			<h2>设置样式</h2>
+			<div id="styleItem">
+				<!-- <label>颜色：</label><input type="color" name="color" /> -->
+				<!-- <input class="jscolor" id="color" name="ab2567" /><br/> -->
+				<!-- <div class="line" id="line"> -->
+					<!-- <label>线宽:</label><input type="text" id="width" name="width" /><br/>
+					<label>类型:</label><input type="text" id="type" name="type" /><br/>
+					<label>透明度:</label><input type="text" id="opacity" name="opactiy" /><br/> -->
+				<!-- </div> -->
+			</div>
 			<div class="button">
 				<button id="sure">确定</button>
 				<button id="cancel">取消</button>
@@ -42,126 +48,333 @@
 		var chinaData=china;
 		var ele=document.getElementById("main");
 
+		var sure=document.getElementById("sure");
+		var cancel=document.getElementById("cancel");
+		var changeColor=document.getElementById("changeColor");
+		// var oInput=changeColor.getElementsByTagName("input")[0];
+		// var oLine=document.getElementById("line");
+		var styleItem=document.getElementById("styleItem");
+		//var count=0;
+
 		var option={
 			backgroundColor:"#ffffff",
 			center:'',
-			visualMapColor:['#50a3ba', '#eac736', '#d94e5d'],
+			//visualMapColor:['#50a3ba', '#eac736', '#d94e5d'],
 			seriesData:eachGeoJson(chinaData)
 		};
-		//console.log(echarts);
 		var mapEchart=new mapEcharts(ele,echarts);
-		mapEchart.DropMapGeo("china",chinaData,option,function(params){
-			var sichuanData={};
+		//加载全国地图
+		var chinaMap=mapEchart.DropMapGeo("china",chinaData,option,function(){
+			mapEchart.linster('mouseover',function(params){
+				ele.oncontextmenu =function(e){
+					e=event || e;
+					e.preventDefault();
+					styleItem.innerHTML='<label>颜色：</label><input type="color" name="color" />';
+					var oInput=styleItem.getElementsByTagName("input")[0];
+					changeColor.style.display="block";
+					sure.onclick=function(){
+						mapEchart.setMapColor(params,oInput.value);
+						changeColor.style.display="none";
+					};
+					cancel.onclick=function(){
+						changeColor.style.display="none";
+					};
+				}
+				
+			});
+		});
+		chinaMap.linster('click',function(params){
+			var provinceData={};
 			//获取对应的地图数据
 			$.getJSON('../mapdata/geometryProvince/'+params.data.id+'.json',function(data){
-				sichuanData=data;
-				option.seriesData=eachGeoJson(sichuanData);
+				provinceData=data;
+				option.seriesData=eachGeoJson(provinceData);
 				option.center=option.seriesData.cp;
-				mapEchart.DropMapGeo("sichuan",sichuanData,option,function(params){
-					var chengduData={};
-					//console.log('../mapdata/geometryCouties/'+params.data.id+'00.json');
+				var provinceMap=mapEchart.DropMapGeo("sichuan",provinceData,option,function(params){
+					mapEchart.linster('mouseover',function(params){
+						ele.oncontextmenu =function(e){
+							e=event || e;
+							e.preventDefault();
+							styleItem.innerHTML='<label>颜色：</label><input type="color" name="color" />';
+							var oInput=styleItem.getElementsByTagName("input")[0];
+							changeColor.style.display="block";
+							sure.onclick=function(){
+								mapEchart.setMapColor(params,oInput.value);
+								changeColor.style.display="none";
+							};
+							cancel.onclick=function(){
+								changeColor.style.display="none";
+							};
+						}
+						
+					});
+				});
+				provinceMap.linster("click",function(params){
+					var cityData={};
 					$.getJSON('../mapdata/geometryCouties/'+params.data.id+'00.json',function(data){
-						chengduData=data;
-						option.seriesData=eachGeoJson(chengduData);
+						cityData=data;
+						option.seriesData=eachGeoJson(cityData);
 						option.center=option.seriesData.cp;
-						mapEchart.DropMapGeo("chengdu",chengduData,option);
-						//var linesData=[[103.88,30.82],[104.05,30.70],[104.10,30.67],[104.43,30.85]];
-						var linesData=[
-							{"name":"郫县","coordinate":[103.88,30.82]},
-							{"name":"金牛","coordinate":[104.05,30.70]},
-							{"name":"成华","coordinate":[104.10,30.67]},
-							{"name":"金堂","coordinate":[104.43,30.85]}
+						var cityMap=mapEchart.DropMapGeo("chengdu",cityData,option,function(){
+							mapEchart.linster('mouseover',function(params){
+								ele.oncontextmenu =function(e){
+									e=event || e;
+									e.preventDefault();
+									styleItem.innerHTML='<label>颜色：</label><input type="color" name="color" />';
+									var oInput=styleItem.getElementsByTagName("input")[0];
+									changeColor.style.display="block";
+									sure.onclick=function(){
+										mapEchart.setMapColor(params,oInput.value);
+										changeColor.style.display="none";
+									};
+									cancel.onclick=function(){
+										changeColor.style.display="none";
+									};
+								}
+								
+							});
+						});
+						//线的json数据
+						var lineJosnData=[
+							[
+								{"name":"郫县","coordinate":[103.88,30.82]},
+								{"name":"金牛","coordinate":[104.05,30.70]},
+								{"name":"成华","coordinate":[104.10,30.67]},
+								{"name":"金堂","coordinate":[104.43,30.85]}
+							],
+							[
+								{"name":"穷莱","coordinate":[103.47,30.42]},
+								{"name":"新津","coordinate":[103.82,30.42]},
+								{"name":"双流","coordinate":[103.92,30.58]},
+								{"name":"龙泉驿","coordinate":[104.27,30.57]}
+							],
+							[
+								{"name":"大邑","coordinate":[103.52,30.58]},
+								{"name":"温江","coordinate":[103.83,30.70]},
+								{"name":"新都","coordinate":[104.15,30.83]},
+								{"name":"青白江","coordinate":[104.23,30.88]}
+							]
 						];
+						 
+						//线的样式
 						var lineOption={         //线的配偶参数
 							"color":"#fff",     //颜色,默认白色#ffffff
 							"width":2,			//宽,默认宽1
 							"type":"solid",		//类型 默认soild
 							"opacity":0.6		//透明度 默认值0.6
 						};
-						var line=mapEchart.setDropLines("line",linesData,lineOption);
-						console.log(line);
-
-						var lineAnimationOption={       //线条动画参数
-							period:4,					//动画时长
-							delay:0,					//动画的延时,支持数字或回调
-							constantSpeed:0,    //动画的速度，设置大于0的数字后period将失效
-							symbol:'circle',     //图像的标记，可以是图片途径
-							color:'#fff',		 //标记的颜色
-							symbolSize:3,         //标记的大小
-							trailLength:0.2,      //特效尾迹的长度，取值范围（0-1）数值越大，尾迹越长
-							loop:true,           //是否循环播放图画
-						};   
-						mapEchart.setLineAnimation(line,lineAnimationOption,true);
-						var spotData=[
-							{"text":"郫县","coordinate":[103.88,30.83]},
-							{"text":"金牛","coordinate":[104.05,30.71]},
-							{"text":"成华","coordinate":[104.10,30.68]},
-							{"text":"金堂","coordinate":[104.43,30.86]}
+						for(var i=0;i<lineJosnData.length;i++){
+							var line=cityMap.setDropLines("line"+i,lineJosnData[i],lineOption);
+							//动画样式
+							var lineAnimationOption={       //线条动画参数
+								period:4,					//动画时长
+								delay:0,					//动画的延时,支持数字或回调
+								constantSpeed:0,    //动画的速度，设置大于0的数字后period将失效
+								symbol:'circle',     //图像的标记，可以是图片途径
+								color:'#fff',		 //标记的颜色
+								symbolSize:3,         //标记的大小
+								trailLength:0.2,      //特效尾迹的长度，取值范围（0-1）数值越大，尾迹越长
+								loop:true,           //是否循环播放图画
+							};
+							//为线设置动画   
+							cityMap.setLineAnimation(line,lineAnimationOption,true);
+						}
+						//点的json数据
+						var spotJosnData=[
+							[
+								{"text":"犀浦站","coordinate":[103.88,30.82]},
+								{"text":"茶店子","coordinate":[103.955063,30.767101]},
+								{"text":"一品天下","coordinate":[104.07522,30.684897]},
+								{"text":"崔家店","coordinate":[104.277878,30.767101]},
+								{"text":"金堂站","coordinate":[104.43,30.85]}
+							],
+							[
+								{"text":"穷莱站","coordinate":[103.47,30.42]},
+								{"text":"新津站","coordinate":[103.649136,30.420487]},
+								{"text":"双流站","coordinate":[103.873928,30.505157]},
+								{"text":"川师大","coordinate":[104.09872,30.57483]},
+								{"text":"龙泉驿站","coordinate":[104.27,30.57]}
+							],
+							[
+								{"text":"大邑站","coordinate":[103.52,30.58]},
+								{"text":"温江站","coordinate":[103.695704,30.648429]},
+								{"text":"新都站","coordinate":[103.985462,30.762694]},
+								{"text":"动物园","coordinate":[104.184382,30.851528]},
+								{"text":"青白江站","coordinate":[104.23,30.88]}
+							]
 						];
-
 						var spotOption={		//点的配置参数
 							color:'#34ddfs',
-							borderColor:'#ffffff',
-							borderWidth:1,
-							borderType:'solid',
+							// borderColor:'#ffffff',
+							// borderWidth:1,
+							// borderType:'solid',
 							opacity:0.4,
 							symbol:'',
 							symbolSize:10,
 							symbolOffset:[0,0]
 						};
-						var spots=mapEchart.setDropSpot("spot",spotData,spotOption);
-						console.log(spots);
-
-						mapEchart.linster('click',function(params){
-							console.log(params);
-							// var textOption={
-							// 	"color":"#DC143C",
-							// 	"fontSize":16,
-							// 	"offset":[0,-20]
-							// };
-							// mapEchart.setSpotText(params,"文字设置",textOption);
-							// var soptImg={
-							// 	"symbol":"image://../img/home.png",
-							// 	"symbolSize":20,
-							// 	"color":"#0000FF",
-							// };
-							// mapEchart.setSoptImg(params,soptImg);
-
-							var lineStyle={
-								"color":"#3CB371",
-								"width":2,
-								"type":"solid",
-								"opactiy":0.4
-							};
-							mapEchart.setLineColor(params,lineStyle);   //设置线条的颜色
+						for(var i=0;i<spotJosnData.length;i++){
+							var spots=mapEchart.setDropSpot("spot"+i,spotJosnData[i],spotOption);	
+						}
+						cityMap.linster("click",function(params){
+							if(params.seriesType=="lines"){      //点击线
+								styleItem.innerHTML='<label>颜色：</label><input type="color" name="textColor"/><br/><label>线宽:</label><input type="text" id="width" name="width" /><br/><label>类型:</label><input type="text" id="type" name="type" /><br/><label>透明度:</label><input type="text" id="opacity" name="opactiy" />';
+								changeColor.style.display="block";
+								var inputs=styleItem.getElementsByTagName("input");
+								sure.onclick=function(){
+									var color=inputs[0].value;
+									var width=inputs[1].value;
+									var type=inputs[2].value;
+									var opactiy=inputs[3].value;
+									//console.log(params);
+									var lineStyle={
+										"color":color,
+										"width":width,
+										"type":type,
+										"opactiy":opactiy
+									};
+									cityMap.setLineColor(params,lineStyle);
+									changeColor.style.display="none";
+								};
+								cancel.onclick=function(){
+									changeColor.style.display="none";
+								};
+							}
+							if(params.seriesType=="scatter"){       //点击点
+								styleItem.innerHTML='<div id="textStyle"><h3>文字样式</h3><label>颜色：</label><input type="color" name="textColor"/><br/><label>大小：</label><input type="text" id="fontsize" name="fontsize" /><br/><label>偏移：</label><input type="text" id="offset" name="offset" /></div><div><label>图形：</label><input type="text" name="symbol"/><br/><label>大小：</label><input type="number" name="symbolSize"/><br/><label>偏移：</label><input type="text" name="symbolOffset"><br/><label>颜色：</label><input type="color" name="symbolColor"/><br/><label>透明度：</label><input type="text" name="symbolOpacity"/></div>';
+								changeColor.style.display="block";
+								var oTextStyle=document.getElementById("textStyle");
+								//var oTextColor=
+								//console.log(oTextStyle);
+							}
+							
 						});
 
-					});
+					})
 				});
 			})
 		});
 
+		// mapEchart.DropMapGeo("china",chinaData,option,function(params){
+		// 	var sichuanData={};
+		// 	//获取对应的地图数据
+		// 	$.getJSON('../mapdata/geometryProvince/'+params.data.id+'.json',function(data){
+		// 		sichuanData=data;
+		// 		option.seriesData=eachGeoJson(sichuanData);
+		// 		option.center=option.seriesData.cp;
+		// 		mapEchart.DropMapGeo("sichuan",sichuanData,option,function(params){
+		// 			var chengduData={};
+		// 			//console.log('../mapdata/geometryCouties/'+params.data.id+'00.json');
+		// 			$.getJSON('../mapdata/geometryCouties/'+params.data.id+'00.json',function(data){
+		// 				chengduData=data;
+		// 				option.seriesData=eachGeoJson(chengduData);
+		// 				option.center=option.seriesData.cp;
+		// 				mapEchart.DropMapGeo("chengdu",chengduData,option);
+		// 				//var linesData=[[103.88,30.82],[104.05,30.70],[104.10,30.67],[104.43,30.85]];
+		// 				var linesData=[
+		// 					{"name":"郫县","coordinate":[103.88,30.82]},
+		// 					{"name":"金牛","coordinate":[104.05,30.70]},
+		// 					{"name":"成华","coordinate":[104.10,30.67]},
+		// 					{"name":"金堂","coordinate":[104.43,30.85]}
+		// 				];
+		// 				var lineOption={         //线的配偶参数
+		// 					"color":"#fff",     //颜色,默认白色#ffffff
+		// 					"width":2,			//宽,默认宽1
+		// 					"type":"solid",		//类型 默认soild
+		// 					"opacity":0.6		//透明度 默认值0.6
+		// 				};
+		// 				var line=mapEchart.setDropLines("line",linesData,lineOption);
+		// 				console.log(line);
 
-		var sure=document.getElementById("sure");
-		var cancel=document.getElementById("cancel");
-		var changeColor=document.getElementById("changeColor");
-		var oInput=changeColor.getElementsByTagName("input")[0];
-		mapEchart.linster('mouseover',function(params){
-			ele.oncontextmenu =function(e){
-				e=event || e;
-				e.preventDefault();
-				changeColor.style.display="block";
-			}
+		// 				var lineAnimationOption={       //线条动画参数
+		// 					period:4,					//动画时长
+		// 					delay:0,					//动画的延时,支持数字或回调
+		// 					constantSpeed:0,    //动画的速度，设置大于0的数字后period将失效
+		// 					symbol:'circle',     //图像的标记，可以是图片途径
+		// 					color:'#fff',		 //标记的颜色
+		// 					symbolSize:3,         //标记的大小
+		// 					trailLength:0.2,      //特效尾迹的长度，取值范围（0-1）数值越大，尾迹越长
+		// 					loop:true,           //是否循环播放图画
+		// 				};   
+		// 				mapEchart.setLineAnimation(line,lineAnimationOption,true);
+		// 				var spotData=[
+		// 					{"text":"郫县","coordinate":[103.88,30.83]},
+		// 					{"text":"金牛","coordinate":[104.05,30.71]},
+		// 					{"text":"成华","coordinate":[104.10,30.68]},
+		// 					{"text":"金堂","coordinate":[104.43,30.86]}
+		// 				];
+
+		// 				var spotOption={		//点的配置参数
+		// 					color:'#34ddfs',
+		// 					borderColor:'#ffffff',
+		// 					borderWidth:1,
+		// 					borderType:'solid',
+		// 					opacity:0.4,
+		// 					symbol:'',
+		// 					symbolSize:10,
+		// 					symbolOffset:[0,0]
+		// 				};
+		// 				var spots=mapEchart.setDropSpot("spot",spotData,spotOption);
+		// 				console.log(spots);
+
+		// 				mapEchart.linster('click',function(params){
+		// 					console.log(params);
+		// 					// var textOption={
+		// 					// 	"color":"#DC143C",
+		// 					// 	"fontSize":16,
+		// 					// 	"offset":[0,-20]
+		// 					// };
+		// 					// mapEchart.setSpotText(params,"文字设置",textOption);
+		// 					// var soptImg={
+		// 					// 	"symbol":"image://../img/home.png",
+		// 					// 	"symbolSize":20,
+		// 					// 	"color":"#0000FF",
+		// 					// };
+		// 					// mapEchart.setSoptImg(params,soptImg);
+
+		// 					var lineStyle={
+		// 						"color":"#3CB371",
+		// 						"width":2,
+		// 						"type":"solid",
+		// 						"opactiy":0.4
+		// 					};
+		// 					mapEchart.setLineColor(params,lineStyle);   //设置线条的颜色
+		// 				});
+
+		// 			});
+		// 		});
+		// 	})
+		// });
+
+
+		// var sure=document.getElementById("sure");
+		// var cancel=document.getElementById("cancel");
+		// var changeColor=document.getElementById("changeColor");
+		// var oInput=changeColor.getElementsByTagName("input")[0];
+		// var count=0;
+		// mapEchart.linster('mouseover',function(params){
+		// 	// console.log();
+		// 	//count++;
+		// 	ele.oncontextmenu =function(e){
+		// 		e=event || e;
+		// 		e.preventDefault();
+		// 		changeColor.style.display="block";
+		// 		sure.onclick=function(){
+		// 			mapEchart.setMapColor(params,oInput.value);
+		// 			changeColor.style.display="none";
+		// 		};
+		// 		cancel.onclick=function(){
+		// 			changeColor.style.display="none";
+		// 		};
+		// 	}
 			
-			sure.onclick=function(){
-				mapEchart.setMapColor(params,oInput.value);
-				changeColor.style.display="none";
-			};
-			cancel.onclick=function(){
-				changeColor.style.display="none";
-			};
-		});
+		// });
 
+		
+		// mapEchart.linster('click',function(params){
+		// 	console.log(mapEchart.count);
+		// 	//console.log(params);
+		// });
 
 
 		// mapEchart.DropMapGeo("china",chinaData,option);

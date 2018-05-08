@@ -1,0 +1,118 @@
+// mapEchart.DropMapGeo("china",chinaData,option,function(params){
+		// 	var sichuanData={};
+		// 	//获取对应的地图数据
+		// 	$.getJSON('../mapdata/geometryProvince/'+params.data.id+'.json',function(data){
+		// 		sichuanData=data;
+		// 		option.seriesData=eachGeoJson(sichuanData);
+		// 		option.center=option.seriesData.cp;
+		// 		mapEchart.DropMapGeo("sichuan",sichuanData,option,function(params){
+		// 			var chengduData={};
+		// 			//console.log('../mapdata/geometryCouties/'+params.data.id+'00.json');
+		// 			$.getJSON('../mapdata/geometryCouties/'+params.data.id+'00.json',function(data){
+		// 				chengduData=data;
+		// 				option.seriesData=eachGeoJson(chengduData);
+		// 				option.center=option.seriesData.cp;
+		// 				mapEchart.DropMapGeo("chengdu",chengduData,option);
+		// 				//var linesData=[[103.88,30.82],[104.05,30.70],[104.10,30.67],[104.43,30.85]];
+		// 				var linesData=[
+		// 					{"name":"郫县","coordinate":[103.88,30.82]},
+		// 					{"name":"金牛","coordinate":[104.05,30.70]},
+		// 					{"name":"成华","coordinate":[104.10,30.67]},
+		// 					{"name":"金堂","coordinate":[104.43,30.85]}
+		// 				];
+		// 				var lineOption={         //线的配偶参数
+		// 					"color":"#fff",     //颜色,默认白色#ffffff
+		// 					"width":2,			//宽,默认宽1
+		// 					"type":"solid",		//类型 默认soild
+		// 					"opacity":0.6		//透明度 默认值0.6
+		// 				};
+		// 				var line=mapEchart.setDropLines("line",linesData,lineOption);
+		// 				console.log(line);
+
+		// 				var lineAnimationOption={       //线条动画参数
+		// 					period:4,					//动画时长
+		// 					delay:0,					//动画的延时,支持数字或回调
+		// 					constantSpeed:0,    //动画的速度，设置大于0的数字后period将失效
+		// 					symbol:'circle',     //图像的标记，可以是图片途径
+		// 					color:'#fff',		 //标记的颜色
+		// 					symbolSize:3,         //标记的大小
+		// 					trailLength:0.2,      //特效尾迹的长度，取值范围（0-1）数值越大，尾迹越长
+		// 					loop:true,           //是否循环播放图画
+		// 				};   
+		// 				mapEchart.setLineAnimation(line,lineAnimationOption,true);
+		// 				var spotData=[
+		// 					{"text":"郫县","coordinate":[103.88,30.83]},
+		// 					{"text":"金牛","coordinate":[104.05,30.71]},
+		// 					{"text":"成华","coordinate":[104.10,30.68]},
+		// 					{"text":"金堂","coordinate":[104.43,30.86]}
+		// 				];
+
+		// 				var spotOption={		//点的配置参数
+		// 					color:'#34ddfs',
+		// 					borderColor:'#ffffff',
+		// 					borderWidth:1,
+		// 					borderType:'solid',
+		// 					opacity:0.4,
+		// 					symbol:'',
+		// 					symbolSize:10,
+		// 					symbolOffset:[0,0]
+		// 				};
+		// 				var spots=mapEchart.setDropSpot("spot",spotData,spotOption);
+		// 				console.log(spots);
+
+		// 				mapEchart.linster('click',function(params){
+		// 					console.log(params);
+		// 					// var textOption={
+		// 					// 	"color":"#DC143C",
+		// 					// 	"fontSize":16,
+		// 					// 	"offset":[0,-20]
+		// 					// };
+		// 					// mapEchart.setSpotText(params,"文字设置",textOption);
+		// 					// var soptImg={
+		// 					// 	"symbol":"image://../img/home.png",
+		// 					// 	"symbolSize":20,
+		// 					// 	"color":"#0000FF",
+		// 					// };
+		// 					// mapEchart.setSoptImg(params,soptImg);
+
+		// 					var lineStyle={
+		// 						"color":"#3CB371",
+		// 						"width":2,
+		// 						"type":"solid",
+		// 						"opactiy":0.4
+		// 					};
+		// 					mapEchart.setLineColor(params,lineStyle);   //设置线条的颜色
+		// 				});
+
+		// 				// mapEchart.linster('mouseover',function(params){
+		// 				// 	console.log(count);
+		// 				// 	count++;
+		// 				// 	ele.oncontextmenu =function(e){
+		// 				// 		e=event || e;
+		// 				// 		e.preventDefault();
+		// 				// 		changeColor.style.display="block";
+		// 				// 		console.log(params);
+		// 				// 		sure.onclick=function(){
+		// 				// 			mapEchart.setMapColor(params,oInput.value);
+		// 				// 			changeColor.style.display="none";
+		// 				// 		};
+		// 				// 		cancel.onclick=function(){
+		// 				// 			changeColor.style.display="none";
+		// 				// 		};
+		// 				// 	}
+							
+		// 				// 	// sure.onclick=function(){
+		// 				// 	// 	mapEchart.setMapColor(params,oInput.value);
+		// 				// 	// 	changeColor.style.display="none";
+		// 				// 	// };
+		// 				// 	// cancel.onclick=function(){
+		// 				// 	// 	changeColor.style.display="none";
+		// 				// 	// };
+		// 				// });
+
+
+
+		// 			});
+		// 		});
+		// 	})
+		// });
