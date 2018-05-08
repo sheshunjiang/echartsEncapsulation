@@ -11,9 +11,13 @@
 	<style type="text/css">
 		.warp{position: relative;}
 		#button{display: block;}
-		.changeColor{width:300px; border: 1px solid #ddd; display: none; position: absolute; top: 350px; left: 250px; z-index: 999;
+		.changeColor{/*width:300px;*/ border: 1px solid #ddd; display: none; position: absolute; top: 350px; left: 250px; z-index: 999;
 			background:#AFEEEE;}
 		label{display: inline-block; width: 80px; margin-left: 10px;}
+		input{margin-right: 10px;}
+		#styleItem{clear: both;}
+		#styleItem:after{display: block;content: "";zoom:1;}
+		#styleItem div{float: left;}
 		.button{margin-top: 10px;}
 		.button button{display: inline-block;}
 	</style>
@@ -25,13 +29,6 @@
 		<div class="changeColor" id="changeColor">
 			<h2>设置样式</h2>
 			<div id="styleItem">
-				<!-- <label>颜色：</label><input type="color" name="color" /> -->
-				<!-- <input class="jscolor" id="color" name="ab2567" /><br/> -->
-				<!-- <div class="line" id="line"> -->
-					<!-- <label>线宽:</label><input type="text" id="width" name="width" /><br/>
-					<label>类型:</label><input type="text" id="type" name="type" /><br/>
-					<label>透明度:</label><input type="text" id="opacity" name="opactiy" /><br/> -->
-				<!-- </div> -->
 			</div>
 			<div class="button">
 				<button id="sure">确定</button>
@@ -51,8 +48,6 @@
 		var sure=document.getElementById("sure");
 		var cancel=document.getElementById("cancel");
 		var changeColor=document.getElementById("changeColor");
-		// var oInput=changeColor.getElementsByTagName("input")[0];
-		// var oLine=document.getElementById("line");
 		var styleItem=document.getElementById("styleItem");
 		//var count=0;
 
@@ -117,21 +112,24 @@
 						option.center=option.seriesData.cp;
 						var cityMap=mapEchart.DropMapGeo("chengdu",cityData,option,function(){
 							mapEchart.linster('mouseover',function(params){
-								ele.oncontextmenu =function(e){
-									e=event || e;
-									e.preventDefault();
-									styleItem.innerHTML='<label>颜色：</label><input type="color" name="color" />';
-									var oInput=styleItem.getElementsByTagName("input")[0];
-									changeColor.style.display="block";
-									sure.onclick=function(){
-										mapEchart.setMapColor(params,oInput.value);
-										changeColor.style.display="none";
-									};
-									cancel.onclick=function(){
-										changeColor.style.display="none";
-									};
+								if(params.seriesType=="lines"){
+									ele.oncontextmenu=null;
+								}else{
+									ele.oncontextmenu =function(e){
+										e=event || e;
+										e.preventDefault();
+										styleItem.innerHTML='<label>颜色：</label><input type="color" name="color" />';
+										var oInput=styleItem.getElementsByTagName("input")[0];
+										changeColor.style.display="block";
+										sure.onclick=function(){
+											mapEchart.setMapColor(params,oInput.value);
+											changeColor.style.display="none";
+										};
+										cancel.onclick=function(){
+											changeColor.style.display="none";
+										};
+									}
 								}
-								
 							});
 						});
 						//线的json数据
@@ -241,9 +239,25 @@
 								};
 							}
 							if(params.seriesType=="scatter"){       //点击点
-								styleItem.innerHTML='<div id="textStyle"><h3>文字样式</h3><label>颜色：</label><input type="color" name="textColor"/><br/><label>大小：</label><input type="text" id="fontsize" name="fontsize" /><br/><label>偏移：</label><input type="text" id="offset" name="offset" /></div><div><label>图形：</label><input type="text" name="symbol"/><br/><label>大小：</label><input type="number" name="symbolSize"/><br/><label>偏移：</label><input type="text" name="symbolOffset"><br/><label>颜色：</label><input type="color" name="symbolColor"/><br/><label>透明度：</label><input type="text" name="symbolOpacity"/></div>';
+								styleItem.innerHTML='<div id="textStyle"><h3>文字样式</h3><label>颜色：</label><input type="color" name="textColor"/><br/><label>大小：</label><input type="text" id="fontsize" name="fontsize" /><br/><label>偏移：</label><input type="text" id="offset" name="offset" /></div><div id="imgStyle"><h3>图标设置</h3><label>图形：</label><input type="text" name="symbol"/><br/><label>大小：</label><input type="number" name="symbolSize"/><br/><label>偏移：</label><input type="text" name="symbolOffset"><br/><label>颜色：</label><input type="color" name="symbolColor"/><br/><label>透明度：</label><input type="text" name="symbolOpacity"/></div>';
 								changeColor.style.display="block";
 								var oTextStyle=document.getElementById("textStyle");
+								var oImgStyle=document.getElementById("imgStyle");
+								var oInputText=oTextStyle.getElementsByTagName("input");
+								var oInputImg=oImgStyle.getElementsByTagName("input");
+								sure.onclick=function(){
+									var textColor=oInputText[0].value;
+									var textSize=oInputText[1].value;
+									var textOffset=oInputText[2].value;
+									var symbolPath=oInputImg[0].value;
+									var symbolSize=oInputImg[1].value;
+									var symbolOffset=oInputImg[2].value;
+									var symbolColor=oInputImg[3].value;
+									var symbolOpactiy=oInputImg[4].value;
+								}
+								cancel.onclick=function(){
+									changeColor.style.display="none";
+								};
 								//var oTextColor=
 								//console.log(oTextStyle);
 							}
