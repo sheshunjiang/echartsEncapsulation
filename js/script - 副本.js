@@ -73,6 +73,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 
 	};
 	chart.setOption(options);
+	//console.log(echarts.getMap());
 	this.chart=chart;
 	if(callback){
 		callback();
@@ -124,7 +125,7 @@ mapEcharts.prototype.setMapColor=function(params,color){
 	var option=this.chart.getOption();
 	for(var i=0; i<option.series.length;i++){
 		if(option.series[i].type==params.seriesType && params.seriesType=="map" && option.series[i].name==params.seriesName){
-			option.series[i].data[params.dataIndex].itemStyle.color="#"+color;
+			option.series[i].data[params.dataIndex].itemStyle.color=color;
 		}
 	}
 	this.chart.setOption(option);
@@ -199,10 +200,10 @@ mapEcharts.prototype.setLineAnimation=function(trajectoryLine,lineAnimationOptio
 	}
 	option.series.push(	
 		{
-	        name: trajectoryLine.seriesName + 'Animation',
+	        name: trajectoryLine[0].seriesName + 'Animation',
 	        type: 'lines',
 	        polyline:true,
-	        zlevel: Math.round(Math.random()*10),
+	        zlevel: Math.round(Math.random()*100),
 	        effect: {
 	            show: isStartUp,
 	            period: lineAnimationOption ? lineAnimationOption.period : 6,
@@ -264,9 +265,9 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
 				"value":spotData[i].coordinate,
 				"itemStyle":{
 					"color":spotOption? spotOption.color : '#ddd',
-					"borderColor":spotOption? spotOption.borderColor : '#ddd',
-					"borderWidth":spotOption? spotOption.borderWidth : 1,
-					"borderType":spotOption? spotOption.borderType : "solid",
+					// "borderColor":spotOption? spotOption.borderColor : '#ddd',
+					// "borderWidth":spotOption? spotOption.borderWidth : 1,
+					// "borderType":spotOption? spotOption.borderType : "solid",
 					"opacity":spotOption? spotOption.opacity : 1
 				},
 				"symbol":spotOption? spotOption.symbol : 'circle',
@@ -295,6 +296,7 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
         data: seriesData,
 		symbol:"circle",
         symbolSize: 12,
+        zlevel:1000,
         hoverAnimation:false,
         label: {
             normal: {
@@ -306,6 +308,7 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
         }
 	});
 	this.chart.setOption(option);
+	console.log(this.chart.getOption());
 	return itemSeries;
 }
 
@@ -365,11 +368,8 @@ mapEcharts.prototype.clearSpot=function(params){
 
 //监听事件
 mapEcharts.prototype.linster=function(eventName,callback){
-     // console.log(this.chart);
+     var echarts=this.echarts;
      this.chart.on(eventName,function(params){
-     	if(eventName=="click"){
-     		console.log(params);
-     	}
      	var param={};
      	if(params.seriesType=="scatter"){
      		param.data=params.data;
