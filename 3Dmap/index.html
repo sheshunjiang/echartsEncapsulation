@@ -2,11 +2,12 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>行政区域切换</title>
+	<title>3D行政区域切换</title>
 	<script type="text/javascript" src="../mapdata/china.json"></script>
-	<script type="text/javascript" src="../js/echarts.js"></script>
+	<script type="text/javascript" src="../3D/echarts.js"></script>
+	<script type="text/javascript" src="../js/echarts-gl.js"></script>
 	<script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
-	<script type="text/javascript" src="../js/script.js"></script>
+	<script type="text/javascript" src="script.js"></script>
 	<style type="text/css">
 		h1,h2,h3{margin:0 0;}
 		h1{font-size: 30px;}
@@ -102,6 +103,7 @@
 		});
 		chinaMap.linster('click',function(params){
 			count++;
+			console.log(params);
 			provinceClcik=params;
 			$("#main").fadeOut("100",function(){
 				dropProvinceMap(params);

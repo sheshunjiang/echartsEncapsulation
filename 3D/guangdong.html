@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>广东省3D</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="echarts.js"></script>
+    <script type="text/javascript" src="../js/echarts-gl.js"></script>
+    <script src="44.json"></script>
+   <!--  <script src="china.json"></script> -->
+    <style type="text/css">
+    #main {
+        width:100%;
+        border:2px solid green;
+        height: 500px;
+    }
+</style>
+
+</head>
+
+<body>
+    <div id="main"></div>
+    <script type="text/javascript">
+        var city=[{name:'珠海市',value:[123,'idc']},{name:'广州市',value:[123,'idc']},{name:'湛江市',value:[123,'idc']},{name:'茂名市',value:[123,'idc']},{name:'阳江市',value:[123,'idc']},{name:'云浮市',value:[123,'idc']},{name:'肇庆市',value:[123,'idc']},{name:'江门市',value:[123,'idc']},{name:'中山市',value:[123,'idc']},{name:'佛山市',value:[123,'idc']},{name:'清远市',value:[123,'idc']},{name:'韶关市',value:[123,'idc']},{name:'河源市',value:[0,'idc']},{name:'梅州市',value:[123,'idc']},{name:'潮州市',value:[255,'idc']},{name:'揭阳市',value:[123,'idc']},{name:'汕头市',value:[123,'idc']},{name:'汕尾市',value:[123,'idc']},{name:'深圳市',value:[123,'idc']},{name:'东莞市',value:[123,'idc']},{name:'惠州市',value:[123,'idc']}]
+        var chart = echarts.init(document.getElementById('main'));
+       //echarts.registerMap("guangdong",guangdong);
+        echarts.registerMap("guangdong",guangdong);
+        var min=0,max=300;
+        var option = {
+            tooltip:{
+                formatter:function(params){
+                    var content='',
+                    content=params.name+params.value[0]+params.value[1];
+                    return content;
+                },
+            },
+            backgroundColor:'#fff',
+            visualMap: {
+                show: false,
+                min: min,
+                max: max,
+                inRange: {
+                    color: ['#e0ffff', '#006edd']
+                },
+                calculable:true
+
+            },
+            geo3D: {
+               map: 'guangdong',
+               roam: true,
+               itemStyle: {
+                   color: '#1d5e98',
+                   opacity: 1,
+                   borderWidth: 0.4,
+                   borderColor: '#000'
+               },
+               label: {
+                   show: true,
+                   textStyle: {
+                         color: '#f00', //地图初始化区域字体颜色
+                         fontSize: 8,
+                         opacity: 1,
+                         backgroundColor: 'rgba(0,23,11,0)'
+                     },
+                 },
+                 emphasis: { //当鼠标放上去  地区区域是否显示名称
+                   label: {
+                       show: true,
+                       textStyle: {
+                           color: '#fff',
+                           fontSize: 3,
+                           backgroundColor: 'rgba(0,23,11,0)'
+                       }
+                   }
+               }
+            }
+        }
+           
+                chart.setOption(option);
+                chart.on('click', function (params) {
+                var cout=params.data.name;
+
+                //window.open('https://www.baidu.com');
+                console.log(params);
+            });
+        </script>
+    </body>
+    </html>

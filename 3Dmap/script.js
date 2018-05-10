@@ -32,43 +32,99 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 		// 		color: '#fff'
 		// 	}
 		// },
-		geo: {
-			map: regionName,
-			center:option.center,
-		    roam:true,   //可以缩放地图
-		    //selectedMode:'single',
-		    label: {
-		      	show:true
-		    },
-		    itemStyle: {
-		      	normal: {
-		       		areaColor: '#00CED1',
-		       		borderColor: '#111'
-		       	},
-		       	emphasis: {
-		       		areaColor: '#f2eca6'
-		       	}
-		    }
-		},
-		series:[
-			{
-				name:regionName,
-                type : "map",
-                geoIndex:0,
-                coordinateSystem:'geo',
-                map : regionName,
-                zoom:1.1,
-                roam : true,
-                label:{
-                        normal:{
-                            show:true
-                        }
-                    },
-                coordinateSystem:'geo',
-                data : option.seriesData
+		geo3D: {
+			// map: regionName,
+			// center:option.center,
+		 //    roam:true,   //可以缩放地图
+		 //    //selectedMode:'single',
+		 //    label: {
+		 //      	show:true
+		 //    },
+		 //    itemStyle: {
+		 //      	normal: {
+		 //       		areaColor: '#00CED1',
+		 //       		borderColor: '#111'
+		 //       	},
+		 //       	emphasis: {
+		 //       		areaColor: '#f2eca6'
+		 //       	}
+		 //    }
+		   map: regionName,
+	       roam: true,
+	       itemStyle: {
+	           color: '#00CED1',
+	           opacity: 1,
+	           borderWidth: 0.4,
+	           borderColor: '#000'
+	       },
+	       label: {
+	           show: true,
+	           textStyle: {
+	                 color: '#f00', //地图初始化区域字体颜色
+	                 fontSize: 8,
+	                 opacity: 1,
+	                 backgroundColor: 'rgba(0,23,11,0)'
+	            },
+	        },
+	        emphasis: { //当鼠标放上去  地区区域是否显示名称
+	           label: {
+	               show: true,
+	               textStyle: {
+	                   //color: '#fff',
+	                   fontSize: 3,
+	                   backgroundColor: 'rgba(0,23,11,0)'
+	               }
+	           }
+	        },
+	         //shading: 'lambert',
+	        light: { //光照阴影
+	           main: {
+	                 color: '#fff', //光照颜色
+	                 intensity: 1.2, //光照强度
+	                 //shadowQuality: 'high', //阴影亮度
+	                 shadow: false, //是否显示阴影
+	                 alpha:55,
+	                 beta:10
 
-            }
-		],
+	             },
+	             ambient: {
+	               intensity: 0.3
+	           }
+	        }
+		},
+		// series:[
+		// 	{
+		// 		name:regionName,
+  //               type : "map3D",
+  //               map:regionName,
+  //               //coordinateSystem:'geo',
+  //               label:{
+  //                  show:true,
+  //                  textStyle:{
+  //                       color:'#EECBAD',
+  //                       fontWeight : 'normal',
+  //                       fontSize : 5,
+  //                       backgroundColor: 'rgba(0,23,11,0)'
+  //                   },
+  //                    emphasis: {//对应的鼠标悬浮效果
+  //                       show: true,
+  //                       textStyle:{color:"#f00"}
+  //                   } 
+  //               },
+  //               itemStyle:{
+  //               	borderWidth:0.4,
+  //               	emphasis: {
+  //                       color: 'rgb(255,255,255)'
+  //                   }
+  //               },
+  //               viewControl: {
+  //                   autoRotate: false,
+  //                   distance: 70
+  //               },
+  //               data : option.seriesData
+
+  //           }
+		// ],
 		animation:true
 		//animationThreshold:20000
 
@@ -78,6 +134,9 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 	if(callback){
 		callback();
 	}
+	chart.on('click',function(params){
+		console.log(params);
+	});
 	return this;
 }
 
