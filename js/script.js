@@ -32,6 +32,12 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 		// 		color: '#fff'
 		// 	}
 		// },
+		tooltip:{
+			trigger:'axis',
+			axisPointer:{
+				type:"shadow"
+			}
+		},
 		geo: {
 			map: regionName,
 			center:option.center,
@@ -48,7 +54,8 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 		       	emphasis: {
 		       		areaColor: '#f2eca6'
 		       	}
-		    }
+		    },
+			regions:option.regionsData
 		},
 		series:[
 			{
@@ -60,16 +67,15 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
                 zoom:1.1,
                 roam : true,
                 label:{
-                        normal:{
-                            show:true
-                        }
+                       show:true,
+                       color:"#FFF"
                     },
                 coordinateSystem:'geo',
                 data : option.seriesData
 
             }
 		],
-		animation:true
+		animation:false
 		//animationThreshold:20000
 
 	};
@@ -91,7 +97,32 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 // 	"seriesName":"china",
 // 	"seriesType":"map"
 // }
-//color:颜色
+//color:颜色，支持普通颜色和渐变
+// var color={					//线性渐变
+// 	type: 'linear',
+//     x: 0,
+//     y: 0,
+//     x2: 1,
+//     y2: 1,
+//     colorStops: [{
+//         offset: 0, color: 'red' // 0% 处的颜色
+//     }, {
+//         offset: 1, color: 'blue' // 100% 处的颜色
+//     }],
+//     globalCoord: false // 缺省为 false
+// };
+// var color={           //径向渐变
+//     type: 'radial',
+//     x: 0.5,
+//     y: 0.5,
+//     r: 0.5,
+//     colorStops: [{
+//         offset: 0, color: 'red' // 0% 处的颜色
+//     }, {
+//         offset: 1, color: 'blue' // 100% 处的颜色
+//     }],
+//     globalCoord: false // 缺省为 false
+// }
 mapEcharts.prototype.setMapColor=function(params,color){
 	var option=this.chart.getOption();
 	for(var i=0; i<option.series.length;i++){
@@ -101,7 +132,20 @@ mapEcharts.prototype.setMapColor=function(params,color){
 	}
 	this.chart.setOption(option);
 }
-
+//设置地图块的文字样式
+mapEcharts.prototype.setMapText=function(params,textStyle){
+	var option=this.chart.getOption();
+	for(var i=0;i<option.geo[0].regions.length;i++){
+		if(option.geo[0].regions[i].name==params.data.name){
+			option.geo[0].regions[i].label.fontFamily=textStyle.fontFamily;
+			option.geo[0].regions[i].label.fontSize=textStyle.fontSize;
+			option.geo[0].regions[i].label.fontWeight=textStyle.fontWeight;
+			option.geo[0].regions[i].label.fontStyle=textStyle.fontStyle;
+			option.geo[0].regions[i].label.color=textStyle.color;
+		}
+	}
+	this.chart.setOption(option);
+}
 
 
 //地图上绘制线条
@@ -412,3 +456,309 @@ mapEcharts.prototype.linster=function(eventName,callback){
         callback(param);
      });
 }
+
+
+//叠加柱状图
+mapEcharts.prototype.overlyBarChart=function(geoData,parData){
+	var that=this;
+	var myChart=this.chart;
+	var geoData=geoData;
+	var parData=parData;
+	renderEachCity();
+	var throttledRenderEachCity = throttle(renderEachCity, 0);
+	this.chart.on('geoRoam',throttledRenderEachCity);
+	//this.chart.setOption(option);
+	function renderEachCity(){
+		var option={
+			xAxis:[],
+			yAxis:[],
+			grid:[],
+			series:[]
+		};
+		echarts.util.each(parData,function(dataItem,idx){
+			var geoCoord = geoData[dataItem.regionName];
+	        var coord = myChart.convertToPixel('geo', geoCoord);  //地理坐标转换
+	        idx += '';
+
+	       //inflationData = [30,50,20];
+	        inflationData=dataItem.yData;
+	        option.xAxis.push({
+	            id: idx,
+	            gridId: idx,
+	            type: 'category',
+	            //name: dataItem[0],
+	            nameLocation: 'middle',
+	            nameGap: 3,
+	            splitLine: {
+	                show: false
+	            },
+	            axisTick: {
+	                show: false
+	            },
+	            axisLabel: {
+	                show: false
+	            },
+	            axisLine: {
+	                onZero: false,
+	                lineStyle: {
+	                    color: '#666'
+	                }
+	            },
+	            data:dataItem.xData,
+	            z: 100
+
+	        });
+	        option.yAxis.push({
+	            id: idx,
+	            gridId: idx,
+	            splitLine: {
+	                show: false
+	            },
+	            axisTick: {
+	                show: false
+	            },
+	            axisLabel: {
+	                show: false
+	            },
+	            axisLine: {
+	                show: false,
+	                lineStyle: {
+	                    color: '#1C70B6'
+	                }
+	            },
+	            z: 100
+	        });
+	        option.grid.push({
+	            id: idx,
+	            width: 30,
+	            height: 40,
+	            left: coord[0] - 15,
+	            top: coord[1] - 15,
+	            z: 100
+	        });
+	        option.series.push({
+	            id: idx,
+	            type: 'bar',
+	            xAxisId: idx,
+	            yAxisId: idx,
+	            barGap: 0,
+	            barCategoryGap: 0,
+	            data: inflationData,
+	            z: 100,
+	            itemStyle: {
+	                normal: {
+	                    color: function(params){
+	                        // 柱状图每根柱子颜色
+	                        var colorList = ['#F75D5D','#59ED4F','#4C91E7'];
+	                        return colorList[params.dataIndex];
+	                    }
+	                }
+	            }
+	        });
+		});
+		myChart.setOption(option);
+		//点击图像
+		myChart.on('click',function(e){
+			if(e.componentSubType=="map"){
+				return;
+			}
+			var zhedang=that.creatWrap();
+			var divObj = document.createElement('div');
+			var divX = getMousePos()['x']; 
+            var divY = getMousePos()['y']; 
+            $(divObj).css({
+                'width': 250,
+                'height': 180,
+                'border': '1px solid #ccc',
+                'position': 'absolute',
+                'top': divY,
+                'left': divX
+            });
+            $(zhedang).append(divObj);
+			that.BarChart(divObj,parData[e.seriesId]);;
+			that.clearWrap(zhedang);
+		});
+	}
+}
+
+//叠加饼形图
+mapEcharts.prototype.overlyPieChart=function(geoData,parData){
+	var myChart=this.chart;
+	var geoData=geoData;
+	var parData=parData;
+	renderEachCityPie();
+	var throttledRenderEachCity = throttle(renderEachCityPie, 0);
+	this.chart.on('geoRoam',throttledRenderEachCity);
+	function renderEachCityPie(){
+		var option={
+			// xAxis:[],
+			// yAxis:[],
+			// grid:[],
+			tooltip:[],
+			series:[]
+		};
+		echarts.util.each(parData,function(dataItem,idx){
+			var geoCoord = geoData[dataItem.regionName];
+	        var coord = myChart.convertToPixel('geo', geoCoord);  //地理坐标转换
+	        idx += '';
+
+	       //inflationData = [30,50,20];
+	        inflationData=dataItem.yData;
+	        // option.series.tooltip.push({
+	        // 	trigger: 'item'
+	        // });
+	        option.series.push({
+	            id: idx,
+	            type: 'pie',
+	            radius : '5%',
+            	center:coord,
+	            data: inflationData,
+	            z: 100,
+	            itemStyle: {
+	                normal: {
+	                    color: function(params){
+	                        // 柱状图每根柱子颜色
+	                        var colorList = ['#F75D5D','#59ED4F','#4C91E7'];
+	                        return colorList[params.dataIndex];
+	                    }
+	                }
+	            },
+	            labelLine:{
+	            	show:false
+	            }
+	        });
+		});
+		myChart.setOption(option);
+	}
+}
+
+// 缩放和拖拽时叠加图跟着改变
+function throttle(fn, delay, debounce) {
+    var currCall;
+    var lastCall = 0;
+    var lastExec = 0;
+    var timer = null;
+    var diff;
+    var scope;
+    var args;
+
+    delay = delay || 0;
+
+    function exec() {
+        lastExec = (new Date()).getTime();
+        timer = null;
+        fn.apply(scope, args || []);
+    }
+
+    var cb = function() {
+        currCall = (new Date()).getTime();
+        scope = this;
+        args = arguments;
+        diff = currCall - (debounce ? lastCall : lastExec) - delay;
+
+        clearTimeout(timer);
+
+        if (debounce) {
+            timer = setTimeout(exec, delay);
+        } else {
+            if (diff >= 0) {
+                exec();
+            } else {
+                timer = setTimeout(exec, -diff);
+            }
+        }
+
+        lastCall = currCall;
+    };
+
+    return cb;
+}
+
+//生成柱状图
+mapEcharts.prototype.BarChart=function(ele,data){
+	console.log(ele);
+	var myChart = this.echarts.init(ele);
+    var option = {
+        backgroundColor: 'rgba(255,255,255,.3)',
+        legend: {
+            data: data.xData
+        },
+        xAxis: [
+            {
+
+                type: 'category',
+                data: data.xData
+            }
+        ],
+        yAxis: [
+            {
+                splitLine: {
+                    show: false
+                },
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+            	name: 'bar'+data.regionName,
+                type: 'bar',
+                itemStyle: {
+                    normal: {
+                        color: function(params){
+                            var colorList = ['#F75D5D','#59ED4F','#4C91E7'];
+                            return colorList[params.dataIndex];
+                        },
+                        label: {
+                            show: true,
+                            position: 'top',
+                            textStyle: {
+                                color: '#000'
+                            }
+                        }
+                    }
+                },
+                data: data.yData
+            }
+        ]
+    };
+    myChart.setOption(option);
+    return myChart;
+}
+
+//生成遮罩层
+mapEcharts.prototype.creatWrap=function(){
+	var parentEle=$(this.ele).parent();
+	if(!parentEle){
+		return;
+	}
+    var zheDang = document.createElement('div');
+    $(zheDang).addClass('zhedang').css({
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        backgroundColor: 'rgba(0,0,0,.2)'
+    });
+    $(parentEle).append($(zheDang));
+    return zheDang;
+}
+
+// 去掉遮挡层
+mapEcharts.prototype.clearWrap=function(element){
+	$(element).click(function(e){
+		this.remove();
+	});
+}
+
+// 获取鼠标横纵坐标
+function getMousePos(e) {
+    var e = event || window.event;
+    var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+    var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+    var x = e.pageX || e.clientX + scrollX;
+    var y = e.pageY || e.clientY + scrollY;
+    // console.log(x,y)
+    return {'x': x,'y': y};
+}
+

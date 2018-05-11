@@ -62,6 +62,8 @@
 			backgroundColor:"#ffffff",
 			center:'',
 			//visualMapColor:['#50a3ba', '#eac736', '#d94e5d'],
+			regionsData:regionsJsonData(chinaData),
+			//regionsData:"",
 			seriesData:eachGeoJson(chinaData)
 		};
 		var mapEchart=new mapEcharts(ele,echarts);
@@ -114,17 +116,64 @@
 		var provinceData={};
 		//获取对应的地图数据
 		$.getJSON('../mapdata/geometryProvince/'+cilckData.data.id+'.json',function(data){
-			//provinceMapData=data;
 			provinceData=data;
 			option.seriesData=eachGeoJson(provinceData);
 			option.center=option.seriesData.cp;
+			var mapCenterCoord=getMapCoord(provinceData);    //获取地理中心数据
 			var provinceMap=mapEchart.DropMapGeo("sichuan",provinceData,option,function(params){
 				mapEchart.linster('mouseover',function(params){
+					//if(params){}
 					updateMapColor(params);
 					
 				});
 			});
+			//叠加柱状图图
+			var parData=[
+				{
+					"regionName":"巴中市",
+					"xData":["数据A","数据B","数据C"],
+					"yData":[100,200,30]
+				},
+				{
+					"regionName":"甘孜藏族自治州",
+					"xData":["数据A","数据B","数据C"],
+					"yData":[10,10,30]
+				},
+				{
+					"regionName":"阿坝藏族羌族自治州",
+					"xData":["数据A","数据B","数据C"],
+					"yData":[10,30,30]
+				}
+			];
+			provinceMap.overlyBarChart(mapCenterCoord,parData);
+			//叠加饼形图
+			var pieData=[
+				{
+					regionName:"巴中市",
+					data:[
+						{value:335, name:'直接访问'},
+		                {value:310, name:'邮件营销'},
+		                {value:274, name:'联盟广告'},
+		                {value:235, name:'视频广告'},
+		                {value:400, name:'搜索引擎'}
+					]
+				},
+				{
+					regionName:"甘孜藏族自治州",
+					data:[
+						{value:335, name:'直接访问'},
+		                {value:310, name:'邮件营销'},
+		                {value:274, name:'联盟广告'},
+		                {value:235, name:'视频广告'},
+		                {value:400, name:'搜索引擎'}
+					]
+				}
+			];
+			//provinceMap.overlyPieChart(mapCenterCoord,parData);
 			provinceMap.linster("click",function(params){
+				if(params.componentSubType=="bar"){
+					return;
+				}
 				count++;
 				cityClick=params;
 				$("#main").fadeOut("100",function(){
@@ -142,6 +191,7 @@
 			//cityMapData=data;
 			cityData=data;
 			option.seriesData=eachGeoJson(cityData);
+			option.regionsData=regionsJsonData(cityData)
 			option.center=option.seriesData.cp;
 			var cityMap=mapEchart.DropMapGeo("chengdu",cityData,option,function(){
 				mapEchart.linster('mouseover',function(params){
@@ -374,7 +424,42 @@
 			var oInput=styleItem.getElementsByTagName("input")[0];
 			changeColor.style.display="block";
 			sure.onclick=function(){
-				mapEchart.setMapColor(params,oInput.value);
+				var color=oInput.value;    //普通颜色
+				// var color1={					//线性渐变
+				// 	type: 'linear',
+				//     x: 0,
+				//     y: 0,
+				//     x2: 1,
+				//     y2: 1,
+				//     colorStops: [{
+				//         offset: 0, color: 'red' // 0% 处的颜色
+				//     }, {
+				//         offset: 1, color: 'blue' // 100% 处的颜色
+				//     }],
+				//     globalCoord: true // 缺省为 false
+				// };
+				// var color={           //径向渐变
+				//     type: 'radial',
+				//     x: 0.5,
+				//     y: 0.5,
+				//     r: 0.5,
+				//     colorStops: [{
+				//         offset: 0, color: 'red' // 0% 处的颜色
+				//     }, {
+				//         offset: 1, color: 'blue' // 100% 处的颜色
+				//     }],
+				//     globalCoord: false // 缺省为 false
+				// }
+				mapEchart.setMapColor(params,color);
+				var textStyle={
+					"fontFamily":"sans-serif",   //字体
+					"fontSize":20,     //字号
+					"fontWeight":"normal",   //加粗
+					"fontStyle":"normal",    //斜体
+					//"color":color1        //颜色
+					"color":"#fff"        //颜色
+				};
+				mapEchart.setMapText(params,textStyle);
 				changeColor.style.display="none";
 			};
 			cancel.onclick=function(){
@@ -397,11 +482,45 @@
 				"value":0,
 				"itemStyle":{
 					"color":"#00CED1"
+				},
+				"label":{
+					"show":true,
+					"color":"#ffffff",
+					"fontFamily":"sans-serif",   //字体
+					"fontSize":20,     //字号
+					"fontWeight":"normal",   //加粗
+					"fontStyle":"normal"    //斜体
 				}
 			}); 
 		}
 		return data;
 	}
-
+	function regionsJsonData(geoJson){
+		var data=[];
+		for(var i=0;i<geoJson.features.length;++i){
+			data.push({
+				"id":geoJson.features[i].properties.id,
+				"name":geoJson.features[i].properties.name,
+				// "cp":geoJson.features[i].properties.cp,
+				// "value":0,
+				"label":{
+					"show":true,
+					"color":"#000000",
+					"fontFamily":"sans-serif",   //字体
+					"fontSize":12,     //字号
+					"fontWeight":"normal",   //加粗
+					"fontStyle":"normal"    //斜体
+				}
+			}); 
+		}
+		return data;
+	}
+	function getMapCoord(geoData){
+		var data={};
+		for(var i=0; i<geoData.features.length;++i){
+			data[geoData.features[i].properties.name]=geoData.features[i].properties.cp;
+		}
+		return data;
+	}
 	</script>
 </html>
