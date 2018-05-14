@@ -135,6 +135,7 @@ mapEcharts.prototype.setMapColor=function(params,color){
 //设置地图块的文字样式
 mapEcharts.prototype.setMapText=function(params,textStyle){
 	var option=this.chart.getOption();
+	console.log(option);
 	for(var i=0;i<option.geo[0].regions.length;i++){
 		if(option.geo[0].regions[i].name==params.data.name){
 			option.geo[0].regions[i].label.fontFamily=textStyle.fontFamily;
@@ -761,4 +762,255 @@ function getMousePos(e) {
     // console.log(x,y)
     return {'x': x,'y': y};
 }
+
+
+//叠加热力图
+mapEcharts.prototype.overlyHeatMap=function(heatMapName,seriesData){
+	var option=this.chart.getOption();
+	var item={
+		"name":heatMapName,
+		"type": 'heatmap',
+        "coordinateSystem": 'geo',
+        "data":seriesData
+
+	};
+	option.visualMap={
+		show:false,
+			min: 0,
+			max: 200,
+			calculable: true,
+			seriesIndex:option.series.length,
+			inRange: {
+				color:['#d94e5d','#eac736','#50a3ba']
+			},
+			// textStyle: {
+			// 	color: '#fff'
+			// }
+	};
+	option.series.push(item);
+	this.chart.setOption(option);
+}
+
+//叠加贝塞尔曲线
+mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
+	if(!barLineID){
+		return;
+	}
+	var falg=false;  //鼠标是否缩放过
+	var myChart=this.chart;
+	var dazData=dazData;
+	var arr=[];
+	arr=dazData;
+	var data=[];
+	dropBezierCurve();
+	var throttledRenderEachCity = throttle(dropBezierCurve, 0);
+	this.chart.on("geoRoam",function(){
+		falg=true;
+		throttledRenderEachCity();
+	});
+	//console.log(myChart.getOption());
+	function dropBezierCurve(){
+		var option=myChart.getOption();
+		data=[];
+		for(var i=0;i<arr.length;i++){
+			data.push(myChart.convertToPixel('geo',arr[i].coord));   //地理坐标转像素坐标
+		}
+		if(!option.graphic){
+			option.graphic=[{}];
+			option.graphic[0].elements=[];
+		}
+		if(falg){
+			option.graphic=[{}];
+			option.graphic[0].elements=[];
+		}
+	    //线
+		var polyline={
+			type:"polyline",
+			//$action:'merge',
+			//id:barLineID,
+			$action:'replace',
+			invisible:false,
+			zlevel:0,
+			z:100,
+			shape:{
+				points:data,
+				smooth:0.5
+			}
+		};
+		option.graphic[0].elements.push(polyline);
+	    //点
+	    for(var i=0;i<data.length;i++){
+	  		var ss={
+	  			type: 'circle',
+		        //$action:'replace',
+		        //$action:'merge',
+		       // barLineID:barLineID,
+		        textDesc:arr[i].name,
+		        position: data[i],
+		        shape: {
+		            cx: 0,
+		            cy: 0,
+		            r: 5
+		        },
+		        invisible: false,
+		        draggable: true,
+		        ondrag: echarts.util.curry(onPointDragging, i),
+		        onmousemove: echarts.util.curry(showTooltip, i),
+		        onmouseout: echarts.util.curry(hideTooltip),
+		        z: 999
+	  		}
+		  	option.graphic[0].elements.push(ss);
+		}
+		//console.log(option);
+		myChart.setOption(option);
+		//console.log(myChart.getOption());
+
+	}
+	function showTooltip(dataIndex) {
+	    var option=myChart.getOption();
+	    var textObj={
+	    	type:'text',
+	    	invisible:false,
+	    	style:{
+	    		text:this.textDesc,
+	    		x:this.position[0],
+	    		y:this.position[1]-20,
+	    		fill:"#fff"
+	    	}
+	    };
+	     option.graphic[0].elements.push(textObj);
+	     myChart.setOption(option,true);
+	}
+
+	function hideTooltip() {
+	   var option=myChart.getOption();
+	   for(var i=0;i<option.graphic[0].elements.length;i++){
+		  if(option.graphic[0].elements[i].type=="text"){
+		  	option.graphic[0].elements.splice(i,1);
+		  	i-=1;
+		  }
+	   }
+	   myChart.setOption(option,true);
+	}
+
+	function onPointDragging(dataIndex, dx, dy) {
+	    var option=myChart.getOption();
+	    data[dataIndex]=this.position;
+	   //线的位置改变
+	   var elements=option.graphic[0].elements;
+	   var circleArr=[];     //小圆点数组
+	   for(var i=0;i<elements.length;i++){
+	   		if(elements[i].type=="polyline" && elements[i].id==this.barLineID){
+	   			 elements[i].shape.points=data;
+	   		}
+	   		if(elements[i].type=="circle" && elements[i].id==this.__ecGraphicId){    //点的位置改变
+	   			elements[i].position=this.position;
+	   		}
+	   }
+	   option.graphic.elements=elements;
+	   myChart.setOption(option,true);
+	}
+}
+//绘制贝塞尔曲线
+// mapEcharts.prototype.dropBezierCurve=function(dazData){
+// 	var arr=[];
+// 	arr=dazData;
+// 	var option=this.chart.getOption();
+// 	//上海，南昌，广州，成都
+// 	//var arr=[[121.4648,31.2891],[116.0046,28.6633],[113.5107,23.2196],[103.9526,30.7617]];
+// 	var data=[];
+// 	for(var i=0;i<arr.length;i++){
+// 		data.push(this.chart.convertToPixel('geo',arr[i].coord));   //地理坐标转像素坐标
+// 	}
+//     option.graphic={};
+//     option.graphic.elements=[];
+// 	var polyline={
+// 		type:"polyline",
+// 		//$action:'merge',
+// 		//id:barLineID,
+// 		$action:'replace',
+// 		invisible:false,
+// 		zlevel:0,
+// 		z:100,
+// 		shape:{
+// 			points:data,
+// 			smooth:0.5
+// 		}
+// 	};
+// 	option.graphic.elements.push(polyline);
+// 	var cc=this.chart;
+//     for(var i=0;i<data.length;i++){
+//   		var ss={
+//   			type: 'circle',
+// 	        //$action:'replace',
+// 	        //$action:'merge',
+// 	        textDesc:arr[i].name,
+// 	        position: data[i],
+// 	        shape: {
+// 	            cx: 0,
+// 	            cy: 0,
+// 	            r: 5
+// 	        },
+// 	        invisible: false,
+// 	        draggable: true,
+// 	        ondrag: echarts.util.curry(onPointDragging, i),
+// 	        onmousemove: echarts.util.curry(showTooltip, i),
+// 	        onmouseout: echarts.util.curry(hideTooltip),
+// 	        z: 999
+//   		}
+// 	  	option.graphic.elements.push(ss);
+// 	}
+// 	this.chart.setOption(option);
+
+// 	var myChart=this.chart;
+
+// 	function showTooltip(dataIndex) {
+// 	    var option=myChart.getOption();
+// 	    var textObj={
+// 	    	type:'text',
+// 	    	invisible:false,
+// 	    	style:{
+// 	    		text:this.textDesc,
+// 	    		x:this.position[0],
+// 	    		y:this.position[1]-20,
+// 	    		fill:"#fff"
+// 	    	}
+// 	    };
+// 	     option.graphic[0].elements.push(textObj);
+// 	     myChart.setOption(option);
+// 	}
+
+// 	function hideTooltip() {
+// 	   var option=myChart.getOption();
+// 	   for(var i=0;i<option.graphic[0].elements.length;i++){
+// 		  if(option.graphic[0].elements[i].type=="text"){
+// 		  	console.log(i);
+// 		  	option.graphic[0].elements.splice(i,1);
+// 		  	i-=1;
+// 		  }
+// 	   }
+// 	   myChart.setOption(option,true);
+// 	}
+
+// 	function onPointDragging(dataIndex, dx, dy) {
+// 	    var option=myChart.getOption();
+// 	    data[dataIndex]=this.position;
+// 	   //线的位置改变
+// 	   var elements=option.graphic[0].elements;
+// 	   var circleArr=[];     //小圆点数组
+// 	   for(var i=0;i<elements.length;i++){
+// 	   		if(elements[i].type=="polyline"){
+// 	   			 elements[i].shape.points=data;
+// 	   		}
+// 	   		if(elements[i].type=="circle" && elements[i].id==this.__ecGraphicId){    //点的位置改变
+// 	   			elements[i].position=this.position;
+// 	   		}
+// 	   }
+// 	   option.graphic.elements=elements;
+// 	   myChart.setOption(option,true);
+// 	}
+
+// }
+
+
 

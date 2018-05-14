@@ -7,6 +7,7 @@
 	<script type="text/javascript" src="../js/echarts.js"></script>
 	<script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="../js/script.js"></script>
+	<script type="text/javascript" src="../mapdata/cityCoordinate.json"></script>
 	<style type="text/css">
 		h1,h2,h3{margin:0 0;}
 		h1{font-size: 30px;}
@@ -102,6 +103,38 @@
 				
 			});
 		});
+		var data=[
+			{name: "莱芜", value: 148},
+            {name: "常德", value: 152},
+            {name: "保定", value: 153},
+            {name: "湘潭", value: 154},
+            {name: "金华", value: 157},
+            {name: "岳阳", value: 169},
+            {name: "长沙", value: 175},
+            {name: "衢州", value: 177},
+            {name: "廊坊", value: 193},
+            {name: "菏泽", value: 194},
+            {name: "合肥", value: 229},
+            {name: "武汉", value: 273},
+            {name: "大庆", value: 279}
+		];
+		chinaMap.overlyHeatMap('heatMap1',convertData(geoCoordMap,data));   //绘制热力图
+		//绘制贝塞尔曲线
+		var bezData=[
+			[
+				{name:"上海",coord:[121.4648,31.2891]},
+				{name:"南昌",coord:[116.0046,28.6633]},
+				{name:"广州",coord:[113.5107,23.2196]},
+				{name:"成都",coord:[103.9526,30.7617]}
+			],
+			[
+				{name:"哈尔滨",coord:[127.9688,45.368]},
+				{name:"唐山",coord:[118.4766,39.6826]},
+				{name:"嘉兴",coord:[120.9155,30.6354]},
+				{name:"大同",coord:[113.7854,39.8035]}
+			]
+		];
+		 chinaMap.overlyBezierCurve(bezData);
 		chinaMap.linster('click',function(params){
 			count++;
 			provinceClcik=params;
@@ -118,6 +151,7 @@
 		$.getJSON('../mapdata/geometryProvince/'+cilckData.data.id+'.json',function(data){
 			provinceData=data;
 			option.seriesData=eachGeoJson(provinceData);
+			option.regionsData=regionsJsonData(provinceData);
 			option.center=option.seriesData.cp;
 			var mapCenterCoord=getMapCoord(provinceData);    //获取地理中心数据
 			var provinceMap=mapEchart.DropMapGeo("sichuan",provinceData,option,function(params){
@@ -191,7 +225,7 @@
 			//cityMapData=data;
 			cityData=data;
 			option.seriesData=eachGeoJson(cityData);
-			option.regionsData=regionsJsonData(cityData)
+			option.regionsData=regionsJsonData(cityData);
 			option.center=option.seriesData.cp;
 			var cityMap=mapEchart.DropMapGeo("chengdu",cityData,option,function(){
 				mapEchart.linster('mouseover',function(params){
@@ -521,6 +555,17 @@
 			data[geoData.features[i].properties.name]=geoData.features[i].properties.cp;
 		}
 		return data;
+	}
+	//数据转换
+	function convertData(geoCoordMap,data){
+		var res = [];
+	    for (var i = 0; i < data.length; i++) {
+	        var geoCoord = geoCoordMap[data[i].name];
+	        if (geoCoord) {
+	            res.push(geoCoord.concat(data[i].value));
+	        }
+	    }
+   	 return res;
 	}
 	</script>
 </html>
