@@ -43,6 +43,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 			center:option.center,
 		    roam:true,   //可以缩放地图
 		    //selectedMode:'single',
+		     zoom:option.zoom? option.zoom :1,
 		    label: {
 		      	show:true
 		    },
@@ -64,7 +65,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
                 geoIndex:0,
                 coordinateSystem:'geo',
                 map : regionName,
-                zoom:1.1,
+                // zoom:1,
                 roam : true,
                 label:{
                        show:true,
@@ -75,9 +76,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 
             }
 		],
-		animation:false
-		//animationThreshold:20000
-
+		animation:true
 	};
 	chart.setOption(options);
 	this.chart=chart;
@@ -803,12 +802,12 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 	arr=dazData;
 	var data=[];
 	dropBezierCurve();
-	var throttledRenderEachCity = throttle(dropBezierCurve, 0);
+	//var throttledRenderEachCity = throttle(dropBezierCurve, 0);
 	this.chart.on("geoRoam",function(){
 		falg=true;
-		throttledRenderEachCity();
+		dropBezierCurve();
+		//throttledRenderEachCity();
 	});
-	//console.log(myChart.getOption());
 	function dropBezierCurve(){
 		var option=myChart.getOption();
 		data=[];
@@ -820,14 +819,21 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 			option.graphic[0].elements=[];
 		}
 		if(falg){
-			option.graphic=[{}];
-			option.graphic[0].elements=[];
+			// option.graphic=[{}];
+			// option.graphic[0].elements=[];
+			for(var j=0;j<option.graphic[0].elements.length;j++){
+				if((option.graphic[0].elements[j].id==barLineID) || (option.graphic[0].elements[j].type=="circle" && option.graphic[0].elements[j].barLineID==barLineID)){
+					option.graphic[0].elements.splice(j,1);
+					j-=1;
+				}
+			}
 		}
+		//option.animation=true;
 	    //线
 		var polyline={
 			type:"polyline",
 			//$action:'merge',
-			//id:barLineID,
+			id:barLineID,
 			$action:'replace',
 			invisible:false,
 			zlevel:0,
@@ -835,7 +841,22 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 			shape:{
 				points:data,
 				smooth:0.5
-			}
+			},
+			 style:{
+			 	lineWidth:1,
+	        	stroke:'#ff0033'
+	        	// stroke:new echarts.graphic.LinearGradient(   //线性渐变
+          //           0, 0, 1, 0, [{
+          //                   offset: 0,
+          //                   color: '#000000'
+          //               },
+          //               {
+          //                   offset: 1,
+          //                   color: '#ff0033'
+          //               }
+          //           ]
+          //       )
+	        },
 		};
 		option.graphic[0].elements.push(polyline);
 	    //点
@@ -844,7 +865,7 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 	  			type: 'circle',
 		        //$action:'replace',
 		        //$action:'merge',
-		       // barLineID:barLineID,
+		        barLineID:barLineID,
 		        textDesc:arr[i].name,
 		        position: data[i],
 		        shape: {
@@ -852,20 +873,27 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 		            cy: 0,
 		            r: 5
 		        },
+		        style:{
+		        	fill:'#ccff33'
+		        },
 		        invisible: false,
 		        draggable: true,
 		        ondrag: echarts.util.curry(onPointDragging, i),
 		        onmousemove: echarts.util.curry(showTooltip, i),
 		        onmouseout: echarts.util.curry(hideTooltip),
+		        //onclick:echarts.util.curry(cc),
 		        z: 999
 	  		}
 		  	option.graphic[0].elements.push(ss);
 		}
-		//console.log(option);
 		myChart.setOption(option);
 		//console.log(myChart.getOption());
 
 	}
+	// function cc(){
+	// 	console.log(this);
+	// }
+
 	function showTooltip(dataIndex) {
 	    var option=myChart.getOption();
 	    var textObj={
@@ -893,7 +921,8 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 	   myChart.setOption(option,true);
 	}
 
-	function onPointDragging(dataIndex, dx, dy) {
+	function onPointDragging(dataIndex) {
+		//console.log(this);
 	    var option=myChart.getOption();
 	    data[dataIndex]=this.position;
 	   //线的位置改变
@@ -908,109 +937,212 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 	   		}
 	   }
 	   option.graphic.elements=elements;
+	   arr[dataIndex].coord=myChart.convertFromPixel("geo",this.position);
 	   myChart.setOption(option,true);
 	}
 }
-//绘制贝塞尔曲线
-// mapEcharts.prototype.dropBezierCurve=function(dazData){
-// 	var arr=[];
-// 	arr=dazData;
-// 	var option=this.chart.getOption();
-// 	//上海，南昌，广州，成都
-// 	//var arr=[[121.4648,31.2891],[116.0046,28.6633],[113.5107,23.2196],[103.9526,30.7617]];
+
+//  //515贝塞尔曲线
+// mapEcharts.prototype.dropBaz=function(arr){
+//  	var myChart=this.chart;
+//  	var option=myChart.getOption();
 // 	var data=[];
 // 	for(var i=0;i<arr.length;i++){
-// 		data.push(this.chart.convertToPixel('geo',arr[i].coord));   //地理坐标转像素坐标
+// 		data.push(myChart.convertToPixel('geo',arr[i].coord));   //地理坐标转像素坐标
 // 	}
-//     option.graphic={};
-//     option.graphic.elements=[];
-// 	var polyline={
-// 		type:"polyline",
-// 		//$action:'merge',
-// 		//id:barLineID,
-// 		$action:'replace',
-// 		invisible:false,
-// 		zlevel:0,
-// 		z:100,
-// 		shape:{
-// 			points:data,
-// 			smooth:0.5
+// 	console.log(data);
+// 	var item={
+// 		"type":"bezierCurve",
+// 		"zlevel":100,
+// 		"shape":{
+// 			x1:data[0][0],
+// 			y1:data[0][1],
+// 			x2:data[5][0],
+// 			y2:data[5][1],
+// 			cpx1:data[1][0],
+// 			cpy1:data[1][1],
+// 			cpx2:data[2][0],
+// 			cpy2:data[2][1],
+// 			cpx3:data[3][0],
+// 			cpy3:data[3][1],
+// 			percent:1
 // 		}
 // 	};
-// 	option.graphic.elements.push(polyline);
-// 	var cc=this.chart;
-//     for(var i=0;i<data.length;i++){
-//   		var ss={
-//   			type: 'circle',
-// 	        //$action:'replace',
-// 	        //$action:'merge',
-// 	        textDesc:arr[i].name,
-// 	        position: data[i],
-// 	        shape: {
-// 	            cx: 0,
-// 	            cy: 0,
-// 	            r: 5
-// 	        },
-// 	        invisible: false,
-// 	        draggable: true,
-// 	        ondrag: echarts.util.curry(onPointDragging, i),
-// 	        onmousemove: echarts.util.curry(showTooltip, i),
-// 	        onmouseout: echarts.util.curry(hideTooltip),
-// 	        z: 999
-//   		}
-// 	  	option.graphic.elements.push(ss);
-// 	}
-// 	this.chart.setOption(option);
-
-// 	var myChart=this.chart;
-
-// 	function showTooltip(dataIndex) {
-// 	    var option=myChart.getOption();
-// 	    var textObj={
-// 	    	type:'text',
-// 	    	invisible:false,
-// 	    	style:{
-// 	    		text:this.textDesc,
-// 	    		x:this.position[0],
-// 	    		y:this.position[1]-20,
-// 	    		fill:"#fff"
-// 	    	}
-// 	    };
-// 	     option.graphic[0].elements.push(textObj);
-// 	     myChart.setOption(option);
-// 	}
-
-// 	function hideTooltip() {
-// 	   var option=myChart.getOption();
-// 	   for(var i=0;i<option.graphic[0].elements.length;i++){
-// 		  if(option.graphic[0].elements[i].type=="text"){
-// 		  	console.log(i);
-// 		  	option.graphic[0].elements.splice(i,1);
-// 		  	i-=1;
-// 		  }
-// 	   }
-// 	   myChart.setOption(option,true);
-// 	}
-
-// 	function onPointDragging(dataIndex, dx, dy) {
-// 	    var option=myChart.getOption();
-// 	    data[dataIndex]=this.position;
-// 	   //线的位置改变
-// 	   var elements=option.graphic[0].elements;
-// 	   var circleArr=[];     //小圆点数组
-// 	   for(var i=0;i<elements.length;i++){
-// 	   		if(elements[i].type=="polyline"){
-// 	   			 elements[i].shape.points=data;
-// 	   		}
-// 	   		if(elements[i].type=="circle" && elements[i].id==this.__ecGraphicId){    //点的位置改变
-// 	   			elements[i].position=this.position;
-// 	   		}
-// 	   }
-// 	   option.graphic.elements=elements;
-// 	   myChart.setOption(option,true);
-// 	}
-
+// 	option.graphic[0].elements.push(item);
+// 	myChart.setOption(option);
 // }
 
 
+// mapEcharts.prototype.setDropLinesBaz=function(lineName,linesData,lineOption){
+// 	var linesArr=[];
+// 	var markPointData=[];
+// 	for(var i=0;i<linesData.length;i++){
+// 		markPointData.push({
+// 			"name":linesData[i].name,
+// 			"coord":linesData[i].coordinate
+// 		});
+// 		if(i==linesData.length-1){
+// 			break;
+// 		}
+// 		linesArr.push(
+// 			{
+// 				"coords":[linesData[i].coordinate,linesData[i+1].coordinate],
+// 				"lineStyle":{
+// 					"color": lineOption ? lineOption.color : "#fff",
+// 					"width":lineOption ? lineOption.width : 1,
+// 					"type":lineOption ? lineOption.type : "solid",
+// 					"opacity":lineOption ? lineOption.opacity : 0.6,
+// 					"curveness":0.5
+// 				}
+// 			}
+// 		);
+// 	}
+// 	console.log(linesArr);
+// 	var option=this.chart.getOption();
+// 	var item={
+//         name:lineName,
+//         type: 'lines',
+//         //polyline:true,
+//         zlevel: 2,
+//         symbolSize: 10,
+//         data:linesArr,
+//         markPoint:{
+//         	symbol:'circle',
+// 			symbolSize:5,
+// 			data:markPointData
+//         },
+//         lineStyle:{
+//         	curveness: 0.5
+//         }
 
+// 	};
+// 	option.series.push(item);
+// 	this.chart.setOption(option);
+// 	return item;                    //返回绘制的线对象
+// }
+
+mapEcharts.prototype.zoomAnimation=function(){
+	var myChart=this.chart;
+	var count = null;
+	var index=0;
+    var zoom = function(per){
+        if(!count) count = per;
+        count = count + per;
+        myChart.setOption({
+            geo: {
+                zoom: count
+            }
+        });
+        if(count < 1){ 
+        	index++;
+        	window.requestAnimationFrame(function(){
+            	zoom(0.2);
+        	});
+        }
+        
+    };
+    window.requestAnimationFrame(function(){
+        zoom(0.2);
+    });
+
+}
+
+
+mapEcharts.prototype.setBaz=function(){
+	arr=[
+			{name:"长春",coord:[125.8154,44.2584]},
+			{name:"呼和浩特",coord:[111.4124,40.4901]},
+			{name:"乌鲁木齐",coord:[87.9236,43.5883]},
+			{name:"成都",coord:[103.9526,30.7617]},
+	];
+	var data=[];
+	for(var i=0;i<arr.length;i++){
+		data.push(this.chart.convertToPixel('geo',arr[i].coord));   //地理坐标转像素坐标
+	}
+	var arr2=[
+			{name:"贵阳",coord:[106.6992,26.7682]},
+			{name:"长沙",coord:[113.0823,28.2568]},
+			{name:"韶关",coord:[113.7964,24.7028]}
+	];
+	var data2=[];
+	for(var i=0;i<arr2.length;i++){
+		data2.push(this.chart.convertToPixel('geo',arr2[i].coord));   //地理坐标转像素坐标
+	}
+	var option=this.chart.getOption();
+
+	option.series.push(
+		{
+			type: 'custom',
+			coordinateSystem:"geo",
+	        renderItem: function (params, api) {
+	            // console.log(params);
+	            // var categoryIndex = api.value(0);
+	            // var start = api.coord([api.value(1), categoryIndex]);
+	            // var end = api.coord([api.value(2), categoryIndex]);
+	            // var height = api.size([0, 1])[1] * 0.6;
+
+
+	            return {
+	            	type: 'group',
+	            	diffChildrenByName:true,
+	           		children: [
+	           			{
+	           				type:"polyline",
+			           		id:'sheshun',
+			           		invisible:false,
+			           		zlevel:0,
+						 	z:100,
+						 	shape:{
+						 		points:data,
+						 		smooth:0.5
+						 	},
+						 	style:{
+						 		fill:null,
+						 		lineWidth:2,
+						 		stroke:"#ff0033"
+						 	}
+	           			},
+	           			{
+	           				type: 'circle',
+					        position: data[0],
+					        shape: {
+					            cx: 0,
+					            cy: 0,
+					            r: 15
+					        },
+					        style:{
+					        	fill:'#ccff33'
+					        },
+					        invisible: false,
+	           			},
+	           			{
+	           				type:"line",
+			           		id:'sheshun',
+			           		invisible:false,
+			           		zlevel:0,
+						 	z:100,
+						 	shape:{
+						 		x1:data2[0][0],
+						 		y1:data2[0][1],
+						 		x2:data2[1][0],
+						 		y2:data2[1][1],
+						 	},
+						 	style:{
+						 		//fill:'',
+						 		lineWidth:2,
+						 		stroke:"#ff0033"
+						 	}
+	           			},
+	           		],
+	           		
+	            };
+	        },
+	        data:arr,
+	        animation:true,
+	        animationDelay:500,
+	        animationDuration:10000,
+	        animationDurationUpdate:10000
+		}
+	);
+	this.chart.setOption(option,true);
+ }
