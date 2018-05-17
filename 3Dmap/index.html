@@ -104,53 +104,6 @@
 		});
 		
 		//mapEchart.zoomAnimation();
-		var data=[
-			{name: "莱芜", value: 148},
-	        {name: "常德", value: 152},
-	        {name: "保定", value: 153},
-	        {name: "湘潭", value: 154},
-	        {name: "金华", value: 157},
-	        {name: "岳阳", value: 169},
-	        {name: "长沙", value: 175},
-	        {name: "衢州", value: 177},
-	        {name: "廊坊", value: 193},
-	        {name: "菏泽", value: 194},
-	        {name: "合肥", value: 229},
-	        {name: "武汉", value: 273},
-	        {name: "大庆", value: 279}
-		];
-		//chinaMap.overlyHeatMap('heatMap1',convertData(geoCoordMap,data));   //绘制热力图
-		//绘制贝塞尔曲线
-		var bazOption={
-			lineWidth:1,
-			lineColor:'#ff0033',
-			spotRadius:10,
-			spotColor:'#ccff33'
-		};
-		var bezData=[
-			{name:"上海",coord:[121.4648,31.2891]},
-			{name:"南昌",coord:[116.0046,28.6633]},
-			{name:"广州",coord:[113.5107,23.2196]},
-			{name:"成都",coord:[103.9526,30.7617]}
-		];
-		chinaMap.overlyBezierCurve('baz',bezData,bazOption);
-		var bazData1=[
-			{name:"哈尔滨",coord:[127.9688,45.368]},
-			{name:"唐山",coord:[118.4766,39.6826]},
-			{name:"嘉兴",coord:[120.9155,30.6354]},
-			{name:"大同",coord:[113.7854,39.8035]}
-		];
-		chinaMap.overlyBezierCurve('baz1',bazData1,bazOption);	
-		chinaMap.overlyImg('IMG1',[87.9236,43.5883],{   //第一张图
-			imgPath:'../img/home.png',
-			width:100,
-			height:100
-		});
-		chinaMap.overlyImg('IMG2',[111.4124,40.4901],{  //第二张图
-			imgPath:'../img/home.png',
-			width:50,
-			height:50
-		});
 		//baz曲线
 		// var baz=[
 		// 	{name:"长春",coord:[125.8154,44.2584]},
@@ -194,59 +147,334 @@
 			if(cilckData.data.id=="65"){
 				//叠加散列图
 				var perpenSpot=[
-					{"text":"犀浦站","coordinate":[88.1653,39.6002]},
-					{"text":"茶店子","coordinate":[81.167,36.9855]},
-					{"text":"一品天下","coordinate":[82.9797,41.0229]},
-					{"text":"崔家店","coordinate":[104.277878,30.767101]},
-					{"text":"金堂站","coordinate":[104.43,30.85]}
-				],
-				mapEcharts.setDropSpot();
+					{"text":"巴音郭楞蒙古自治州","coordinate":[88.1653,39.6002],value:100},
+					{"text":"和田地区","coordinate":[81.167,36.9855],value:200},
+					{"text":"哈密地区","coordinate":[93.7793,42.9236],value:50},
+					{"text":"阿克苏地区","coordinate":[82.9797,41.0229],value:300},
+					{"text":"阿勒泰地区","coordinate":[88.2971,47.0929],value:250},
+					{"text":"喀什地区","coordinate":[77.168,37.8534],value:120},
+					{"text":"塔城地区","coordinate":[86.6272,45.8514],value:100},
+					{"text":"昌吉回族自治州","coordinate":[89.6814,44.4507],value:180},
+					{"text":"克孜勒苏柯尔克孜自治州","coordinate":[74.6301,39.5233],value:210},
+					{"text":"吐鲁番地区","coordinate":[89.6375,42.4127],value:150},
+					{"text":"伊犁哈萨克自治州","coordinate":[82.5513,43.5498],value:300},
+					{"text":"博尔塔拉蒙古自治州","coordinate":[81.8481,44.6979],value:240},
+					{"text":"乌鲁木齐市","coordinate":[87.9236,43.5883],value:220},
+					{"text":"克拉玛依市","coordinate":[85.2869,45.5054],value:197},
+					{"text":"阿拉尔市","coordinate":[81.2769,40.6549],value:206},
+					{"text":"图木舒克市","coordinate":[79.1345,39.8749],value:82},
+					{"text":"五家渠市","coordinate":[87.5391,44.3024],value:69},
+					{"text":"石河子市","coordinate":[86.0229,44.2914],value:114}
+				];
+				var spotOption={		
+					color:'#FF00FF',
+					symbol:'pin',
+					symbolSize:20
+				};
+				var symbolDynamicSize={
+					isDynamicSize:true,
+					size:5
+				};
+				var colorDynamic={
+					isDynamicColor:true,
+					color:['#9A32CD','#71C671','#0000FF'],
+					min:0,
+					max:350
+				};
+				provinceMap.overlyScatter('personCount',perpenSpot,spotOption,symbolDynamicSize,colorDynamic);
 			}
-			//叠加柱状图图
-			var parData=[
-				{
-					"regionName":"巴中市",
-					"xData":["数据A","数据B","数据C"],
-					"yData":[100,200,30]
-				},
-				{
-					"regionName":"甘孜藏族自治州",
-					"xData":["数据A","数据B","数据C"],
-					"yData":[10,10,30]
-				},
-				{
-					"regionName":"阿坝藏族羌族自治州",
-					"xData":["数据A","数据B","数据C"],
-					"yData":[10,30,30]
-				}
-			];
-			//provinceMap.overlyBarChart3D(mapCenterCoord,parData);
-			provinceMap.overlyBarChart(mapCenterCoord,parData);
-			//叠加饼形图
-			var pieData=[
-				{
-					regionName:"巴中市",
-					data:[
-						{value:335, name:'直接访问'},
-		                {value:310, name:'邮件营销'},
-		                {value:274, name:'联盟广告'},
-		                {value:235, name:'视频广告'},
-		                {value:400, name:'搜索引擎'}
-					]
-				},
-				{
-					regionName:"甘孜藏族自治州",
-					data:[
-						{value:335, name:'直接访问'},
-		                {value:310, name:'邮件营销'},
-		                {value:274, name:'联盟广告'},
-		                {value:235, name:'视频广告'},
-		                {value:400, name:'搜索引擎'}
+			//西藏，展示贝塞尔曲线
+			if(cilckData.data.id=="54"){
+				var bazOption1={
+					lineWidth:1,
+					lineColor:'#ff0033',
+					spotRadius:5,
+					spotColor:'#ccff33'
+				};
+				var bezData1=[
+					{name:"阿里地区",coord:[82.3645,32.7667]},
+					{name:"那曲地区",coord:[88.1982,33.3215]},
+					{name:"昌都地区",coord:[97.0203,30.7068]}
+				];
+				provinceMap.overlyBezierCurve('baz1',bezData1,bazOption1);
+				var bazData2=[
+					{name:"日喀则地区",coord:[86.2427,29.5093]},
+					{name:"拉萨市",coord:[91.1865,30.1465]},
+					{name:"山南地区",coord:[92.2083,28.3392]},
+					{name:"林芝地区",coord:[95.4602,29.1138]}
+				];
+				var bazOption2={
+					lineWidth:1,
+					lineColor:'#00EE00',
+					spotRadius:8,
+					spotColor:'#8B1C62'
+				};
+				var gradualColor={        
+					isGradual:true,   //是否启用渐变色
+					direction:[0,0,0,1],  //渐变方向,0,0,0,1(下-上);0,1,0,0(上-下);0,0,1,0(左-右);
+					colors:[
+						{               //起始颜色
+							offset:0, 
+							color: '#66CD00'
+						},
+						{               //终止颜色
+							offset:1, 
+							color: '#8B0000'
+						}
 					]
 				}
-			];
-			//provinceMap.overlyPieChart(mapCenterCoord,parData);
+				provinceMap.overlyBezierCurve('baz2',bazData2,bazOption2,gradualColor);	
+			}
+			//内蒙古，展示热力图
+			if(cilckData.data.id=="15"){
+				var heatData=[
+					{name: "呼伦贝尔市", value: 148},
+			        {name: "阿拉善盟", value: 252},
+			        {name: "锡林郭勒盟", value: 353},
+			        {name: "鄂尔多斯市", value: 154},
+			        {name: "赤峰市", value: 557},
+			        {name: "巴彦淖尔市", value: 469},
+			        {name: "通辽市", value: 475},
+			        {name: "乌兰察布市", value: 77},
+			        {name: "包头市", value: 593},
+			        {name: "呼和浩特市", value: 590},
+			        {name: "乌海市", value: 229}
+				];
+				var heatOption={       //配置参数
+					min:0,         //最小值
+					max:500,       //最大值
+					color:['#CDCD00','#0000FF','#8B0000']   //颜色
+				}
+				provinceMap.overlyHeatMap('heatMap1',convertData(getMapCoord(provinceData),heatData),heatOption);   //绘制热力图
+			}
+			//甘肃，展示叠加图片
+			if(cilckData.data.id=="62"){
+				provinceMap.overlyImg('IMG1',[96.2622,40.4517],{   //第一张图
+					imgPath:'../img/home.png',
+					width:100,
+					height:100
+				});
+				provinceMap.overlyImg('IMG2',[104.5569,35.0848],{  //第二张图
+					imgPath:'../img/home.png',
+					width:50,
+					height:50
+				});
+			}
+			//陕西，叠加饼图
+			if(cilckData.data.id=="61"){
+				var pieData=[
+					{
+						regionName:"榆林市",
+						data:[
+							{value:115, name:'直接访问'},
+			                {value:310, name:'邮件营销'},
+			                {value:204, name:'联盟广告'},
+			                {value:205, name:'视频广告'},
+			                {value:300, name:'搜索引擎'}
+						]
+					},
+					{
+						regionName:"延安市",
+						data:[
+							{value:335, name:'直接访问'},
+			                {value:310, name:'邮件营销'},
+			                {value:274, name:'联盟广告'},
+			                {value:235, name:'视频广告'},
+			                {value:400, name:'搜索引擎'}
+						]
+					}
+				];
+				provinceMap.overlyPieChart('pine1',mapCenterCoord,pieData,{
+					radius:'8%',
+					colorArr:['#F75D5D','#59ED4F','#4C91E7',"#c23531", "#2f4554", "#61a0a8", "#d48265"]
+				});
+				var pieData1=[
+					{
+						regionName:"汉中市",
+						data:[
+							{value:100, name:'直接访问'},
+			                {value:50, name:'邮件营销'},
+			                {value:274, name:'联盟广告'},
+			                {value:205, name:'视频广告'},
+			                {value:190, name:'搜索引擎'}
+						]
+					},
+				];
+				provinceMap.overlyPieChart('pine2',mapCenterCoord,pieData1,{
+					radius:'8%',
+					colorArr:['#F75D5D','#59ED4F','#4C91E7',"#c23531", "#2f4554", "#61a0a8", "#d48265"]
+				});
+			}
+			//四川，叠加柱状图
+			if(cilckData.data.id=="51"){
+				//叠加柱状图图
+				var parData=[
+					{
+						"regionName":"巴中市",
+						"xData":["数据A","数据B","数据C"],
+						"yData":[100,200,30]
+					},
+					{
+						"regionName":"甘孜藏族自治州",
+						"xData":["数据A","数据B","数据C"],
+						"yData":[10,10,30]
+					},
+					{
+						"regionName":"阿坝藏族羌族自治州",
+						"xData":["数据A","数据B","数据C"],
+						"yData":[10,30,30]
+					}
+				];
+				var barOption={
+					colorArr:['#F75D5D','#59ED4F','#4C91E7',"#c23531", "#2f4554", "#61a0a8", "#d48265"],
+					width:30 ,  // 柱状图宽 支持百分比
+					height:40   //柱状图高
+				};
+				//provinceMap.overlyBarChart3D(mapCenterCoord,parData);
+				//provinceMap.overlyBarChart('bar1',mapCenterCoord,parData,barOption);
+				var parData1=[
+					{
+						"regionName":"凉山彝族自治州",
+						"xData":["数据A","数据B","数据C"],
+						"yData":[100,200,30]
+					},
+					{
+						"regionName":"乐山市",
+						"xData":["数据A","数据B","数据C","数据D"],
+						"yData":[10,60,30,100]
+					},
+					{
+						"regionName":"绵阳市",
+						"xData":["数据A","数据B","数据C","数据D"],
+						"yData":[10,30,30,80]
+					}
+				];
+				//provinceMap.overlyBarChart('bar2',mapCenterCoord,parData1,barOption);
+			}
+			//青海，叠加点
+			if(cilckData.data.id=="63"){
+				var spotJosnData=[
+					[
+						{"text":"果洛藏族自治州","coordinate":[99.3823,34.0466],value:10},
+						{"text":"海南藏族自治州","coordinate":[100.3711,35.9418],value:12},
+						{"text":"黄南藏族自治州","coordinate":[101.5686,35.1178],value:20}
+					],
+					[
+						{"text":"海北藏族自治州","coordinate":[100.3711,37.9138],value:30},
+						{"text":"海东地区","coordinate":[102.3706,36.2988],value:13},
+						{"text":"西宁市","coordinate":[101.4038,36.8207],value:12}
+					],
+					[
+						{"text":"海西蒙古族藏族自治州","coordinate":[94.9768,37.1118],value:5},
+						{"text":"玉树藏族自治州","coordinate":[93.5925,33.9368],value:6}
+					]
+				];
+				var spotOption={		//点的配置参数
+					color:'#ffffff',
+					opacity:1,
+					symbol:'image://../img/home.png',
+					symbolSize:10,
+					symbolOffset:[0,-20],
+					textStyle:{     //文字样式
+						show:true,
+						color:'#000',
+						fontSize:12,
+						offset:[0,-15]
+					}
+				};
+				spotOption.symbol='circle';
+				spotOption.color='#ff6600';
+				spotOption.textStyle.color='#cc3399';
+				var spot1=provinceMap.setDropSpot("spot1",spotJosnData[0],spotOption);
+				spotOption.symbol='rect';
+				spotOption.color='#66ff33';
+				spotOption.textStyle.color='#FF6EB4';
+				var spot2=provinceMap.setDropSpot("spot2",spotJosnData[1],spotOption);
+				spotOption.symbol='image://../img/home.png';
+				spotOption.color='#fff';
+				spotOption.symbolSize='20';
+				spotOption.textStyle.color='#CD6839';
+				var spot3=provinceMap.setDropSpot("spot3",spotJosnData[2],spotOption);
+			}
+			//湖南，叠加线
+			if(cilckData.data.id=="43"){
+				var lineJosnData=[
+					[
+						{"name":"湘西土家族苗族自治州","coordinate":[109.7864,28.6743]},
+						{"name":"张家界市","coordinate":[110.5115,29.328]},
+						{"name":"常德市","coordinate":[111.4014,29.2676]},
+						{"name":"岳阳市","coordinate":[113.2361,29.1357]}
+					],
+					[
+						{"name":"益阳市","coordinate":[111.731,28.3832]},
+						{"name":"怀化市","coordinate":[109.9512,27.4438]},
+						{"name":"邵阳市","coordinate":[110.9619,26.8121]},
+						{"name":"永州市","coordinate":[111.709,25.752]}
+					],
+					[
+						{"name":"长沙市","coordinate":[113.0823,28.2568]},
+						{"name":"湘潭市","coordinate":[112.5439,27.7075]},
+						{"name":"衡阳市","coordinate":[112.4121,26.7902]},
+						{"name":"郴州市","coordinate":[113.2361,25.8673]}
+					]
+				];
+				 
+				//线的样式
+				var lineOption={         //线的配偶参数
+					"color":"#ff3300",     //颜色,默认白色#ffffff
+					"width":2,			//宽,默认宽1
+					"type":"solid",		//类型 默认soild
+					"opacity":0.6		//透明度 默认值0.6
+				};
+				var line1=provinceMap.setDropLines("line1",lineJosnData[0],lineOption,true);
+				lineOption.color="#BA55D3";
+				lineOption.width=1;
+				var line2=provinceMap.setDropLines("line2",lineJosnData[1],lineOption,true);
+				lineOption.color="#8E8E38";
+				lineOption.width=1;
+				lineOption.type="dashed";
+				var line3=provinceMap.setDropLines("line3",lineJosnData[2],lineOption,false);
+				var falg=true;
+				var aa=provinceMap.setLineAnimation(line1,{
+					period:4,					//动画时长
+					delay:0,					//动画的延时,支持数字或回调
+					constantSpeed:0,    //动画的速度，设置大于0的数字后period将失效
+					symbol:'rect',     //图像的标记，可以是图片途径
+					color:'#90EE90',		 //标记的颜色
+					symbolSize:5,         //标记的大小
+					trailLength:0.2,      //特效尾迹的长度，取值范围（0-1）数值越大，尾迹越长
+					loop:true,   
+				},true);
+				provinceMap.setLineAnimation(line2,{
+					period:4,					//动画时长
+					delay:0,					//动画的延时,支持数字或回调
+					constantSpeed:0,    //动画的速度，设置大于0的数字后period将失效
+					symbol:'circle',     //图像的标记，可以是图片途径
+					color:'#CD0000',		 //标记的颜色
+					symbolSize:3,         //标记的大小
+					trailLength:0.2,      //特效尾迹的长度，取值范围（0-1）数值越大，尾迹越长
+					loop:true,   
+				},true);
+				
+				var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z';
+				var ss=provinceMap.setLineAnimation(line3,{
+					period:4,					//动画时长
+					delay:0,					//动画的延时,支持数字或回调
+					constantSpeed:0,    //动画的速度，设置大于0的数字后period将失效
+					symbol:planePath,     //图像的标记，可以是图片途径
+					color:'#CD9B1D',		 //标记的颜色
+					symbolSize:12,         //标记的大小
+					trailLength:0,      //特效尾迹的长度，取值范围（0-1）数值越大，尾迹越长
+					loop:true,   
+				},true);
+				//设置线段样式
+				// provinceMap.setLineStyle(line1,{"color":"#000",
+				// 			"width":2,
+				// 			"type":'solid',
+				// 			"opacity":1},0);
+			}
 			provinceMap.linster("click",function(params){
+				console.log(1);
 				if(params.componentSubType=="bar"){
 					return;
 				}
@@ -302,7 +530,12 @@
 							"type":type,
 							"opacity":opacity
 						};
-						cityMap.setLineStyle(params,lineStyle);
+						var lineObj={
+							name:params.seriesName,
+							type:params.seriesType
+						};
+						var dataIndex=params.dataIndex;
+						cityMap.setLineStyle(lineObj,lineStyle,dataIndex);
 						changeColor.style.display="none";
 					};
 					cancel.onclick=function(){
@@ -331,7 +564,13 @@
 							"fontSize":parseInt(textSize),
 							"offset":[parseInt(textOffset.split(",")[0]),parseInt(textOffset.split(",")[1])]
 						};
-						cityMap.setSpotText(params,text,textOption);
+						var spotObj={
+							seriesName: params.seriesName,
+				        	seriesType: params.seriesType,
+				        	data: params.data,
+				        	dataIndex:params.dataIndex
+						};
+						cityMap.setSpotText(spotObj,text,textOption);
 						var symbolPath=oInputImg[0].value;
 						var symbolSize=oInputImg[1].value;
 						//var symbolOffset=oInputImg[2].value;
@@ -342,7 +581,7 @@
 							"symbolSize":symbolSize,
 							"color":symbolColor
 						};
-						cityMap.setSoptImg(params,iocStyle);
+						cityMap.setSoptImg(spotObj,iocStyle);
 					}
 					cancel.onclick=function(){
 						changeColor.style.display="none";

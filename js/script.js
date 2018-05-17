@@ -345,6 +345,7 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
         }
 	});
 	this.chart.setOption(option);
+	console.log(this.chart.getOption());
 	return itemSeries;
 }
 
