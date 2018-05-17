@@ -789,9 +789,45 @@ mapEcharts.prototype.overlyHeatMap=function(heatMapName,seriesData){
 	option.series.push(item);
 	this.chart.setOption(option);
 }
-
+//叠加图片
+mapEcharts.prototype.overlyImg=function(name,coords,imgOption){
+	var myChart=this.chart;
+	rendImg();
+	myChart.on("geoRoam",function(){
+		rendImg();
+	});
+	function rendImg(){
+		var option=myChart.getOption();
+		var arr=myChart.convertToPixel('geo',coords);
+		if(!option.graphic){
+			option.graphic=[{}];
+			option.graphic[0].elements=[];
+		}
+		for(var j=0;j<option.graphic[0].elements.length;j++){
+			if((option.graphic[0].elements[j].id==name) && (option.graphic[0].elements[j].type=="image")){
+				option.graphic[0].elements.splice(j,1);
+				j-=1;
+			}
+		}
+		var item={
+			type:'image',
+			id:name,
+			z:1,
+			zlevel:999,
+			style:{
+				image:imgOption.imgPath,
+				x:arr[0]-imgOption.width/2,
+				y:arr[1]-imgOption.height/2,
+				width:imgOption.width,
+				height:imgOption.height
+			}
+		};
+		option.graphic[0].elements.push(item);
+		myChart.setOption(option);
+	}
+}
 //叠加贝塞尔曲线
-mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
+mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData,bazOption){
 	if(!barLineID){
 		return;
 	}
@@ -819,8 +855,6 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 			option.graphic[0].elements=[];
 		}
 		if(falg){
-			// option.graphic=[{}];
-			// option.graphic[0].elements=[];
 			for(var j=0;j<option.graphic[0].elements.length;j++){
 				if((option.graphic[0].elements[j].id==barLineID) || (option.graphic[0].elements[j].type=="circle" && option.graphic[0].elements[j].barLineID==barLineID)){
 					option.graphic[0].elements.splice(j,1);
@@ -828,7 +862,6 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 				}
 			}
 		}
-		//option.animation=true;
 	    //线
 		var polyline={
 			type:"polyline",
@@ -837,14 +870,14 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 			$action:'replace',
 			invisible:false,
 			zlevel:0,
-			z:100,
+			z:0,
 			shape:{
 				points:data,
 				smooth:0.5
 			},
 			 style:{
-			 	lineWidth:1,
-	        	stroke:'#ff0033'
+			 	lineWidth:bazOption.lineWidth ? bazOption.lineWidth:1,
+	        	stroke:bazOption.lineColor? bazOption.lineColor : '#000',
 	        	// stroke:new echarts.graphic.LinearGradient(   //线性渐变
           //           0, 0, 1, 0, [{
           //                   offset: 0,
@@ -871,17 +904,16 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 		        shape: {
 		            cx: 0,
 		            cy: 0,
-		            r: 5
+		            r: bazOption.spotRadius ? bazOption.spotRadius:5,
 		        },
 		        style:{
-		        	fill:'#ccff33'
+		        	fill:bazOption.spotColor ? bazOption.spotColor:'#000',
 		        },
 		        invisible: false,
 		        draggable: true,
 		        ondrag: echarts.util.curry(onPointDragging, i),
 		        onmousemove: echarts.util.curry(showTooltip, i),
 		        onmouseout: echarts.util.curry(hideTooltip),
-		        //onclick:echarts.util.curry(cc),
 		        z: 999
 	  		}
 		  	option.graphic[0].elements.push(ss);
@@ -922,7 +954,6 @@ mapEcharts.prototype.overlyBezierCurve=function(barLineID,dazData){
 	}
 
 	function onPointDragging(dataIndex) {
-		//console.log(this);
 	    var option=myChart.getOption();
 	    data[dataIndex]=this.position;
 	   //线的位置改变
@@ -1146,3 +1177,7 @@ mapEcharts.prototype.setBaz=function(){
 	);
 	this.chart.setOption(option,true);
  }
+
+
+
+

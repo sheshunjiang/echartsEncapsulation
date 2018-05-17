@@ -45,7 +45,6 @@
 </body>
 <!-- 依赖百度echarts.js -->
 	<script type="text/javascript">
-		//var geoData={};    //地图数据
 		var chinaData=china;
 		var ele=document.getElementById("main");
 
@@ -54,12 +53,18 @@
 		var changeColor=document.getElementById("changeColor");
 		var styleItem=document.getElementById("styleItem");
 		var btn=document.getElementById("button");
+		var count=0; //当前地图层级
 		var provinceClcik,cityClick;
 		var option={
 			backgroundColor:"#ffffff",
 			center:'',
-			//visualMapColor:['#50a3ba', '#eac736', '#d94e5d'],
-			seriesData:eachGeoJson(chinaData)
+			zoom:1,
+			regionsData:regionsJsonData(chinaData),    //2d地图所需数据
+			seriesData:eachGeoJson(chinaData),
+			areaColor:'#99ffff',      //地图颜色，当具体的区域块没有设置颜色的时候有效
+			textColor:'#111',		  //地图文字颜色额
+			borderColor:'#fff',       //地图块边界颜色
+			hoverColor:'#f2eca6'      //地图高亮颜色
 		};
 		var mapEchart=new mapEcharts(ele,echarts);
 		//加载全国地图
@@ -74,7 +79,7 @@
 				$("#main").fadeOut("100",function(){
 					setTimeout(function(){
 						dropChinaMap();
-					},100);
+					},50);
 					//dropChinaMap();
 					$("#main").fadeIn("200");
 				});
@@ -93,13 +98,73 @@
 		option.center=option.seriesData.cp;
 		var chinaMap=mapEchart.DropMapGeo("china",chinaData,option,function(){
 			mapEchart.linster('mouseover',function(params){
-				updateMapColor(params);
+				updateMapColor("china",params);
 				
 			});
 		});
+		
+		//mapEchart.zoomAnimation();
+		var data=[
+			{name: "莱芜", value: 148},
+	        {name: "常德", value: 152},
+	        {name: "保定", value: 153},
+	        {name: "湘潭", value: 154},
+	        {name: "金华", value: 157},
+	        {name: "岳阳", value: 169},
+	        {name: "长沙", value: 175},
+	        {name: "衢州", value: 177},
+	        {name: "廊坊", value: 193},
+	        {name: "菏泽", value: 194},
+	        {name: "合肥", value: 229},
+	        {name: "武汉", value: 273},
+	        {name: "大庆", value: 279}
+		];
+		//chinaMap.overlyHeatMap('heatMap1',convertData(geoCoordMap,data));   //绘制热力图
+		//绘制贝塞尔曲线
+		var bazOption={
+			lineWidth:1,
+			lineColor:'#ff0033',
+			spotRadius:10,
+			spotColor:'#ccff33'
+		};
+		var bezData=[
+			{name:"上海",coord:[121.4648,31.2891]},
+			{name:"南昌",coord:[116.0046,28.6633]},
+			{name:"广州",coord:[113.5107,23.2196]},
+			{name:"成都",coord:[103.9526,30.7617]}
+		];
+		chinaMap.overlyBezierCurve('baz',bezData,bazOption);
+		var bazData1=[
+			{name:"哈尔滨",coord:[127.9688,45.368]},
+			{name:"唐山",coord:[118.4766,39.6826]},
+			{name:"嘉兴",coord:[120.9155,30.6354]},
+			{name:"大同",coord:[113.7854,39.8035]}
+		];
+		chinaMap.overlyBezierCurve('baz1',bazData1,bazOption);	
+		chinaMap.overlyImg('IMG1',[87.9236,43.5883],{   //第一张图
+			imgPath:'../img/home.png',
+			width:100,
+			height:100
+		});
+		chinaMap.overlyImg('IMG2',[111.4124,40.4901],{  //第二张图
+			imgPath:'../img/home.png',
+			width:50,
+			height:50
+		});
+		//baz曲线
+		// var baz=[
+		// 	{name:"长春",coord:[125.8154,44.2584]},
+		// 	{name:"呼和浩特",coord:[111.4124,40.4901]},
+		// 	{name:"乌鲁木齐",coord:[87.9236,43.5883]},
+		// 	{name:"成都",coord:[103.9526,30.7617]},
+		// 	{name:"贵阳",coord:[106.6992,26.7682]},
+		// 	{name:"长沙",coord:[113.0823,28.2568]},
+		// 	// {name:"韶关",coord:[113.7964,24.7028]}
+		// ];
+		// chinaMap.dropBaz(baz);
+		//chinaMap.setBaz();
 		chinaMap.linster('click',function(params){
 			count++;
-			console.log(params);
 			provinceClcik=params;
 			$("#main").fadeOut("100",function(){
 				dropProvinceMap(params);
@@ -112,17 +177,79 @@
 		var provinceData={};
 		//获取对应的地图数据
 		$.getJSON('../mapdata/geometryProvince/'+cilckData.data.id+'.json',function(data){
-			//provinceMapData=data;
 			provinceData=data;
 			option.seriesData=eachGeoJson(provinceData);
+			option.regionsData=regionsJsonData(provinceData);
 			option.center=option.seriesData.cp;
+			option.zoom=1;
+			var mapCenterCoord=getMapCoord(provinceData);    //获取地理中心数据
 			var provinceMap=mapEchart.DropMapGeo("sichuan",provinceData,option,function(params){
 				mapEchart.linster('mouseover',function(params){
-					updateMapColor(params);
+					//if(params){}
+					updateMapColor('sichuan',params);
 					
 				});
 			});
+			//新疆，展示散列图
+			if(cilckData.data.id=="65"){
+				//叠加散列图
+				var perpenSpot=[
+					{"text":"犀浦站","coordinate":[88.1653,39.6002]},
+					{"text":"茶店子","coordinate":[81.167,36.9855]},
+					{"text":"一品天下","coordinate":[82.9797,41.0229]},
+					{"text":"崔家店","coordinate":[104.277878,30.767101]},
+					{"text":"金堂站","coordinate":[104.43,30.85]}
+				],
+				mapEcharts.setDropSpot();
+			}
+			//叠加柱状图图
+			var parData=[
+				{
+					"regionName":"巴中市",
+					"xData":["数据A","数据B","数据C"],
+					"yData":[100,200,30]
+				},
+				{
+					"regionName":"甘孜藏族自治州",
+					"xData":["数据A","数据B","数据C"],
+					"yData":[10,10,30]
+				},
+				{
+					"regionName":"阿坝藏族羌族自治州",
+					"xData":["数据A","数据B","数据C"],
+					"yData":[10,30,30]
+				}
+			];
+			//provinceMap.overlyBarChart3D(mapCenterCoord,parData);
+			provinceMap.overlyBarChart(mapCenterCoord,parData);
+			//叠加饼形图
+			var pieData=[
+				{
+					regionName:"巴中市",
+					data:[
+						{value:335, name:'直接访问'},
+		                {value:310, name:'邮件营销'},
+		                {value:274, name:'联盟广告'},
+		                {value:235, name:'视频广告'},
+		                {value:400, name:'搜索引擎'}
+					]
+				},
+				{
+					regionName:"甘孜藏族自治州",
+					data:[
+						{value:335, name:'直接访问'},
+		                {value:310, name:'邮件营销'},
+		                {value:274, name:'联盟广告'},
+		                {value:235, name:'视频广告'},
+		                {value:400, name:'搜索引擎'}
+					]
+				}
+			];
+			//provinceMap.overlyPieChart(mapCenterCoord,parData);
 			provinceMap.linster("click",function(params){
+				if(params.componentSubType=="bar"){
+					return;
+				}
 				count++;
 				cityClick=params;
 				$("#main").fadeOut("100",function(){
@@ -140,13 +267,15 @@
 			//cityMapData=data;
 			cityData=data;
 			option.seriesData=eachGeoJson(cityData);
+			option.regionsData=regionsJsonData(cityData);
 			option.center=option.seriesData.cp;
+			option.zoom=1;
 			var cityMap=mapEchart.DropMapGeo("chengdu",cityData,option,function(){
 				mapEchart.linster('mouseover',function(params){
 					if(params.seriesType=="lines"){
 						ele.oncontextmenu=null;
 					}else{
-						updateMapColor(params);
+						updateMapColor('chengdu',params);
 					}
 				});
 			});
@@ -251,7 +380,7 @@
 		 
 		//线的样式
 		var lineOption={         //线的配偶参数
-			"color":"#fff",     //颜色,默认白色#ffffff
+			"color":"#ff3300",     //颜色,默认白色#ffffff
 			"width":2,			//宽,默认宽1
 			"type":"solid",		//类型 默认soild
 			"opacity":0.6		//透明度 默认值0.6
@@ -362,17 +491,65 @@
 		cityMap.clearSpot(spot1);
 	}
 	//设置地图颜色
-	function updateMapColor(params){
+	function updateMapColor(mapName,params){
 		ele.oncontextmenu =function(e){
 			e=event || e;
 			e.preventDefault();
+			var param={
+				mapName:mapName,
+				id:params.data.id,
+				name:params.data.name,
+				dataIndex:params.dataIndex
+			};
+			//mapEchart.search('china',{id:params.data.id,name:params.data.name});  //查找指定行政区域在地图中的位子  
 			changeColor.style.left=e.clientX+"px";
 			changeColor.style.top=e.clientY+"px";
-			styleItem.innerHTML='<label>颜色：</label><input type="color" name="color" />';
-			var oInput=styleItem.getElementsByTagName("input")[0];
+			styleItem.innerHTML='<label>区域颜色：</label><input type="color" name="color" /><br/><label>字体大小:</label><input type="text" name="fontSize" /><br/><label>字体系列:</label><input type="text" name="fontFamily" /><br/><label>字体粗细:</label><input type="text" name="fontWeight" /><br/><label>字体风格:</label><input type="text" name="fontStyle" /><br/><label>字体颜色:</label><input type="color" name="color" />';
+			var oInput=styleItem.getElementsByTagName("input");
 			changeColor.style.display="block";
 			sure.onclick=function(){
-				mapEchart.setMapColor(params,oInput.value);
+				var color=oInput[0].value;    //普通颜色
+				// var color1={					//线性渐变
+				// 	type: 'linear',
+				//     x: 0,
+				//     y: 0,
+				//     x2: 1,
+				//     y2: 1,
+				//     colorStops: [{
+				//         offset: 0, color: 'red' // 0% 处的颜色
+				//     }, {
+				//         offset: 1, color: 'blue' // 100% 处的颜色
+				//     }],
+				//     globalCoord: true // 缺省为 false
+				// };
+				// var color={           //径向渐变
+				//     type: 'radial',
+				//     x: 0.5,
+				//     y: 0.5,
+				//     r: 0.5,
+				//     colorStops: [{
+				//         offset: 0, color: 'red' // 0% 处的颜色
+				//     }, {
+				//         offset: 1, color: 'blue' // 100% 处的颜色
+				//     }],
+				//     globalCoord: false // 缺省为 false
+				// }
+				mapEchart.setMapColor(param,color);
+				
+				var fontSize=oInput[1].value;
+				var fontFamily=oInput[2].value;
+				var fontWeight=oInput[3].value;
+				var fontStyle=oInput[4].value;
+				var fontColor=oInput[5].value;
+				var textStyle={
+					"fontFamily":fontFamily? fontFamily :"sans-serif",   //字体
+					"fontSize":fontSize ? fontSize :20,     //字号
+					"fontWeight":fontWeight? fontWeight:"normal",   //加粗
+					"fontStyle":fontStyle?fontStyle:"normal",    //斜体
+					//"color":color1        //颜色
+					"color":fontColor? fontColor :"#fff"        //颜色
+				};
+				mapEchart.setMapText(param,textStyle);
 				changeColor.style.display="none";
 			};
 			cancel.onclick=function(){
@@ -392,14 +569,39 @@
 				"id":geoJson.features[i].properties.id,
 				"name":geoJson.features[i].properties.name,
 				"cp":geoJson.features[i].properties.cp,
-				"value":0,
-				"itemStyle":{
-					"color":"#00CED1"
-				}
+				"value":0
 			}); 
 		}
 		return data;
 	}
-
+	function regionsJsonData(geoJson){
+		var data=[];
+		for(var i=0;i<geoJson.features.length;++i){
+			data.push({
+				"id":geoJson.features[i].properties.id,
+				"name":geoJson.features[i].properties.name
+			}); 
+		}
+		return data;
+	}
+	function getMapCoord(geoData){
+		var data={};
+		for(var i=0; i<geoData.features.length;++i){
+			data[geoData.features[i].properties.name]=geoData.features[i].properties.cp;
+		}
+		return data;
+	}
+	//数据转换
+	function convertData(geoCoordMap,data){
+		var res = [];
+	    for (var i = 0; i < data.length; i++) {
+	        var geoCoord = geoCoordMap[data[i].name];
+	        if (geoCoord) {
+	            res.push(geoCoord.concat(data[i].value));
+	        }
+	    }
+   	 return res;
+	}
 	</script>
+
 </html>

@@ -785,7 +785,11 @@
          }])
       }]
 }
-echarts.init(document.getElementById('main')).setOption(option);
+var chart=echarts.init(document.getElementById('main'));
+chart.setOption(option);
+chart.on('click',function(params){
+  console.log(11);
+});
 </script>
 </body>
 </html>

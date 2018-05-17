@@ -5,6 +5,7 @@
 	<title>行政区域切换</title>
 	<script type="text/javascript" src="../mapdata/china.json"></script>
 	<script type="text/javascript" src="../js/echarts.js"></script>
+	<!-- <script type="text/javascript" src="../js/echarts-gl.js"></script> -->
 	<script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="../js/script.js"></script>
 	<script type="text/javascript" src="../mapdata/cityCoordinate.json"></script>
@@ -123,21 +124,36 @@
 		];
 		//chinaMap.overlyHeatMap('heatMap1',convertData(geoCoordMap,data));   //绘制热力图
 		//绘制贝塞尔曲线
+		var bazOption={
+			lineWidth:1,
+			lineColor:'#ff0033',
+			spotRadius:10,
+			spotColor:'#ccff33'
+		};
 		var bezData=[
 			{name:"上海",coord:[121.4648,31.2891]},
 			{name:"南昌",coord:[116.0046,28.6633]},
 			{name:"广州",coord:[113.5107,23.2196]},
 			{name:"成都",coord:[103.9526,30.7617]}
 		];
-		chinaMap.overlyBezierCurve('baz',bezData);
+		chinaMap.overlyBezierCurve('baz',bezData,bazOption);
 		var bazData1=[
 			{name:"哈尔滨",coord:[127.9688,45.368]},
 			{name:"唐山",coord:[118.4766,39.6826]},
 			{name:"嘉兴",coord:[120.9155,30.6354]},
 			{name:"大同",coord:[113.7854,39.8035]}
 		];
-		chinaMap.overlyBezierCurve('baz1',bazData1);	
-
+		chinaMap.overlyBezierCurve('baz1',bazData1,bazOption);	
+		chinaMap.overlyImg('IMG1',[87.9236,43.5883],{   //第一张图
+			imgPath:'../img/home.png',
+			width:100,
+			height:100
+		});
+		chinaMap.overlyImg('IMG2',[111.4124,40.4901],{  //第二张图
+			imgPath:'../img/home.png',
+			width:50,
+			height:50
+		});
 		//baz曲线
 		// "长春": [125.8154,44.2584],
 		//    "长沙": [113.0823,28.2568],
@@ -594,4 +610,7 @@
    	 return res;
 	}
 	</script>
+
+
 </html>
+
