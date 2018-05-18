@@ -5523,7 +5523,7 @@ vec3.angle = function(a, b) {
 /**
  * @module zrender/core/util
  */
-// 用于处理merge时无法遍历Date等对象的问题
+// ç”¨äºŽå¤„ç†mergeæ—¶æ— æ³•éåŽ†Dateç­‰å¯¹è±¡çš„é—®é¢˜
 var BUILTIN_OBJECT = {
   '[object Function]': 1,
   '[object RegExp]': 1,
@@ -5645,11 +5645,11 @@ function merge(target, source, overwrite) {
       var sourceProp = source[key];
 
       if (isObject(sourceProp) && isObject(targetProp) && !isArray(sourceProp) && !isArray(targetProp) && !isDom(sourceProp) && !isDom(targetProp) && !isBuiltInObject(sourceProp) && !isBuiltInObject(targetProp) && !isPrimitive(sourceProp) && !isPrimitive(targetProp)) {
-        // 如果需要递归覆盖，就递归调用merge
+        // å¦‚æžœéœ€è¦é€’å½’è¦†ç›–ï¼Œå°±é€’å½’è°ƒç”¨merge
         merge(targetProp, sourceProp, overwrite);
       } else if (overwrite || !(key in target)) {
-        // 否则只处理overwrite为true，或者在目标对象中没有此属性的情况
-        // NOTE，在 target[key] 不存在的时候也是直接覆盖
+        // å¦åˆ™åªå¤„ç†overwriteä¸ºtrueï¼Œæˆ–è€…åœ¨ç›®æ ‡å¯¹è±¡ä¸­æ²¡æœ‰æ­¤å±žæ€§çš„æƒ…å†µ
+        // NOTEï¼Œåœ¨ target[key] ä¸å­˜åœ¨çš„æ—¶å€™ä¹Ÿæ˜¯ç›´æŽ¥è¦†ç›–
         target[key] = clone(source[key], true);
       }
     }
@@ -5728,7 +5728,7 @@ function getContext() {
   return _ctx;
 }
 /**
- * 查询数组中元素的index
+ * æŸ¥è¯¢æ•°ç»„ä¸­å…ƒç´ çš„index
  * @memberOf module:zrender/core/util
  */
 
@@ -5749,11 +5749,11 @@ function indexOf(array, value) {
   return -1;
 }
 /**
- * 构造类继承关系
+ * æž„é€ ç±»ç»§æ‰¿å…³ç³»
  *
  * @memberOf module:zrender/core/util
- * @param {Function} clazz 源类
- * @param {Function} baseClazz 基类
+ * @param {Function} clazz æºç±»
+ * @param {Function} baseClazz åŸºç±»
  */
 
 
@@ -5803,7 +5803,7 @@ function isArrayLike(data) {
   return typeof data.length == 'number';
 }
 /**
- * 数组或对象遍历
+ * æ•°ç»„æˆ–å¯¹è±¡éåŽ†
  * @memberOf module:zrender/core/util
  * @param {Object|Array} obj
  * @param {Function} cb
@@ -5831,7 +5831,7 @@ function each(obj, cb, context) {
   }
 }
 /**
- * 数组映射
+ * æ•°ç»„æ˜ å°„
  * @memberOf module:zrender/core/util
  * @param {Array} obj
  * @param {Function} cb
@@ -5883,7 +5883,7 @@ function reduce(obj, cb, memo, context) {
   }
 }
 /**
- * 数组过滤
+ * æ•°ç»„è¿‡æ»¤
  * @memberOf module:zrender/core/util
  * @param {Array} obj
  * @param {Function} cb
@@ -5912,7 +5912,7 @@ function filter(obj, cb, context) {
   }
 }
 /**
- * 数组项查找
+ * æ•°ç»„é¡¹æŸ¥æ‰¾
  * @memberOf module:zrender/core/util
  * @param {Array} obj
  * @param {Function} cb
@@ -7097,7 +7097,7 @@ var Pass = __WEBPACK_IMPORTED_MODULE_0__core_Base__["a" /* default */].extend(fu
         if (this.blendWithPrevious) {
             // Blend with previous rendered scene in the final output
             // FIXME Configure blend.
-            // FIXME It will cause screen blink？
+            // FIXME It will cause screen blinkï¼Ÿ
             _gl.enable(_gl.BLEND);
             this.material.transparent = true;
         }
@@ -24953,7 +24953,7 @@ BoundingRect.prototype = {
     var a = this;
     var sx = b.width / a.width;
     var sy = b.height / a.height;
-    var m = matrix.create(); // 矩阵右乘
+    var m = matrix.create(); // çŸ©é˜µå³ä¹˜
 
     matrix.translate(m, m, [-a.x, -a.y]);
     matrix.scale(m, m, [sx, sy]);
@@ -25038,7 +25038,7 @@ module.exports = _default;
 
 var ArrayCtor = typeof Float32Array === 'undefined' ? Array : Float32Array;
 /**
- * 创建一个向量
+ * åˆ›å»ºä¸€ä¸ªå‘é‡
  * @param {number} [x=0]
  * @param {number} [y=0]
  * @return {Vector2}
@@ -25060,7 +25060,7 @@ function create(x, y) {
   return out;
 }
 /**
- * 复制向量数据
+ * å¤åˆ¶å‘é‡æ•°æ®
  * @param {Vector2} out
  * @param {Vector2} v
  * @return {Vector2}
@@ -25073,7 +25073,7 @@ function copy(out, v) {
   return out;
 }
 /**
- * 克隆一个向量
+ * å…‹éš†ä¸€ä¸ªå‘é‡
  * @param {Vector2} v
  * @return {Vector2}
  */
@@ -25086,11 +25086,11 @@ function clone(v) {
   return out;
 }
 /**
- * 设置向量的两个项
+ * è®¾ç½®å‘é‡çš„ä¸¤ä¸ªé¡¹
  * @param {Vector2} out
  * @param {number} a
  * @param {number} b
- * @return {Vector2} 结果
+ * @return {Vector2} ç»“æžœ
  */
 
 
@@ -25100,7 +25100,7 @@ function set(out, a, b) {
   return out;
 }
 /**
- * 向量相加
+ * å‘é‡ç›¸åŠ 
  * @param {Vector2} out
  * @param {Vector2} v1
  * @param {Vector2} v2
@@ -25113,7 +25113,7 @@ function add(out, v1, v2) {
   return out;
 }
 /**
- * 向量缩放后相加
+ * å‘é‡ç¼©æ”¾åŽç›¸åŠ 
  * @param {Vector2} out
  * @param {Vector2} v1
  * @param {Vector2} v2
@@ -25127,7 +25127,7 @@ function scaleAndAdd(out, v1, v2, a) {
   return out;
 }
 /**
- * 向量相减
+ * å‘é‡ç›¸å‡
  * @param {Vector2} out
  * @param {Vector2} v1
  * @param {Vector2} v2
@@ -25140,7 +25140,7 @@ function sub(out, v1, v2) {
   return out;
 }
 /**
- * 向量长度
+ * å‘é‡é•¿åº¦
  * @param {Vector2} v
  * @return {number}
  */
@@ -25153,7 +25153,7 @@ function len(v) {
 var length = len; // jshint ignore:line
 
 /**
- * 向量长度平方
+ * å‘é‡é•¿åº¦å¹³æ–¹
  * @param {Vector2} v
  * @return {number}
  */
@@ -25164,7 +25164,7 @@ function lenSquare(v) {
 
 var lengthSquare = lenSquare;
 /**
- * 向量乘法
+ * å‘é‡ä¹˜æ³•
  * @param {Vector2} out
  * @param {Vector2} v1
  * @param {Vector2} v2
@@ -25176,7 +25176,7 @@ function mul(out, v1, v2) {
   return out;
 }
 /**
- * 向量除法
+ * å‘é‡é™¤æ³•
  * @param {Vector2} out
  * @param {Vector2} v1
  * @param {Vector2} v2
@@ -25189,7 +25189,7 @@ function div(out, v1, v2) {
   return out;
 }
 /**
- * 向量点乘
+ * å‘é‡ç‚¹ä¹˜
  * @param {Vector2} v1
  * @param {Vector2} v2
  * @return {number}
@@ -25200,7 +25200,7 @@ function dot(v1, v2) {
   return v1[0] * v2[0] + v1[1] * v2[1];
 }
 /**
- * 向量缩放
+ * å‘é‡ç¼©æ”¾
  * @param {Vector2} out
  * @param {Vector2} v
  * @param {number} s
@@ -25213,7 +25213,7 @@ function scale(out, v, s) {
   return out;
 }
 /**
- * 向量归一化
+ * å‘é‡å½’ä¸€åŒ–
  * @param {Vector2} out
  * @param {Vector2} v
  */
@@ -25233,7 +25233,7 @@ function normalize(out, v) {
   return out;
 }
 /**
- * 计算向量间距离
+ * è®¡ç®—å‘é‡é—´è·ç¦»
  * @param {Vector2} v1
  * @param {Vector2} v2
  * @return {number}
@@ -25246,7 +25246,7 @@ function distance(v1, v2) {
 
 var dist = distance;
 /**
- * 向量距离平方
+ * å‘é‡è·ç¦»å¹³æ–¹
  * @param {Vector2} v1
  * @param {Vector2} v2
  * @return {number}
@@ -25258,7 +25258,7 @@ function distanceSquare(v1, v2) {
 
 var distSquare = distanceSquare;
 /**
- * 求负向量
+ * æ±‚è´Ÿå‘é‡
  * @param {Vector2} out
  * @param {Vector2} v
  */
@@ -25269,7 +25269,7 @@ function negate(out, v) {
   return out;
 }
 /**
- * 插值两个点
+ * æ’å€¼ä¸¤ä¸ªç‚¹
  * @param {Vector2} out
  * @param {Vector2} v1
  * @param {Vector2} v2
@@ -25283,7 +25283,7 @@ function lerp(out, v1, v2, t) {
   return out;
 }
 /**
- * 矩阵左乘向量
+ * çŸ©é˜µå·¦ä¹˜å‘é‡
  * @param {Vector2} out
  * @param {Vector2} v
  * @param {Vector2} m
@@ -25298,7 +25298,7 @@ function applyTransform(out, v, m) {
   return out;
 }
 /**
- * 求两个向量最小值
+ * æ±‚ä¸¤ä¸ªå‘é‡æœ€å°å€¼
  * @param  {Vector2} out
  * @param  {Vector2} v1
  * @param  {Vector2} v2
@@ -25311,7 +25311,7 @@ function min(out, v1, v2) {
   return out;
 }
 /**
- * 求两个向量最大值
+ * æ±‚ä¸¤ä¸ªå‘é‡æœ€å¤§å€¼
  * @param  {Vector2} out
  * @param  {Vector2} v1
  * @param  {Vector2} v2
@@ -25355,7 +25355,7 @@ exports.max = max;
 /***/ (function(module, exports) {
 
 /**
- * 3x2矩阵操作类
+ * 3x2çŸ©é˜µæ“ä½œç±»
  * @exports zrender/tool/matrix
  */
 var ArrayCtor = typeof Float32Array === 'undefined' ? Array : Float32Array;
@@ -25370,7 +25370,7 @@ function create() {
   return out;
 }
 /**
- * 设置矩阵为单位矩阵
+ * è®¾ç½®çŸ©é˜µä¸ºå•ä½çŸ©é˜µ
  * @param {Float32Array|Array.<number>} out
  */
 
@@ -25385,7 +25385,7 @@ function identity(out) {
   return out;
 }
 /**
- * 复制矩阵
+ * å¤åˆ¶çŸ©é˜µ
  * @param {Float32Array|Array.<number>} out
  * @param {Float32Array|Array.<number>} m
  */
@@ -25401,7 +25401,7 @@ function copy(out, m) {
   return out;
 }
 /**
- * 矩阵相乘
+ * çŸ©é˜µç›¸ä¹˜
  * @param {Float32Array|Array.<number>} out
  * @param {Float32Array|Array.<number>} m1
  * @param {Float32Array|Array.<number>} m2
@@ -25427,7 +25427,7 @@ function mul(out, m1, m2) {
   return out;
 }
 /**
- * 平移变换
+ * å¹³ç§»å˜æ¢
  * @param {Float32Array|Array.<number>} out
  * @param {Float32Array|Array.<number>} a
  * @param {Float32Array|Array.<number>} v
@@ -25444,7 +25444,7 @@ function translate(out, a, v) {
   return out;
 }
 /**
- * 旋转变换
+ * æ—‹è½¬å˜æ¢
  * @param {Float32Array|Array.<number>} out
  * @param {Float32Array|Array.<number>} a
  * @param {number} rad
@@ -25469,7 +25469,7 @@ function rotate(out, a, rad) {
   return out;
 }
 /**
- * 缩放变换
+ * ç¼©æ”¾å˜æ¢
  * @param {Float32Array|Array.<number>} out
  * @param {Float32Array|Array.<number>} a
  * @param {Float32Array|Array.<number>} v
@@ -25488,7 +25488,7 @@ function scale(out, a, v) {
   return out;
 }
 /**
- * 求逆矩阵
+ * æ±‚é€†çŸ©é˜µ
  * @param {Float32Array|Array.<number>} out
  * @param {Float32Array|Array.<number>} a
  */
@@ -25909,8 +25909,8 @@ function quantityExponent(val) {
   return Math.floor(Math.log(val) / Math.LN10);
 }
 /**
- * find a “nice” number approximately equal to x. Round the number if round = true,
- * take ceiling if round = false. The primary observation is that the “nicest”
+ * find a â€œniceâ€ number approximately equal to x. Round the number if round = true,
+ * take ceiling if round = false. The primary observation is that the â€œnicestâ€
  * numbers in decimal are 1, 2, and 5, and all power-of-ten multiples of these numbers.
  *
  * See "Nice Numbers for Graph Labels" of Graphic Gems.
@@ -27062,7 +27062,7 @@ MapServiceCoordSys3D.prototype = {
         this.viewGL.camera.decomposeWorldTransform();
 
         // scale vertically to meters per pixel (inverse of ground resolution):
-        // worldSize / (circumferenceOfEarth * cos(lat * π / 180))
+        // worldSize / (circumferenceOfEarth * cos(lat * Ï€ / 180))
         var worldSize = TILE_SIZE * this.getScale();
         var verticalScale;
 
@@ -35164,9 +35164,9 @@ var Animator = function (target, loop, getter, setter) {
 
 Animator.prototype = {
   /**
-   * 设置动画关键帧
-   * @param  {number} time 关键帧时间，单位是ms
-   * @param  {Object} props 关键帧的属性值，key-value表示
+   * è®¾ç½®åŠ¨ç”»å…³é”®å¸§
+   * @param  {number} time å…³é”®å¸§æ—¶é—´ï¼Œå•ä½æ˜¯ms
+   * @param  {Object} props å…³é”®å¸§çš„å±žæ€§å€¼ï¼Œkey-valueè¡¨ç¤º
    * @return {module:zrender/animation/Animator}
    */
   when: function (time
@@ -35211,7 +35211,7 @@ Animator.prototype = {
   },
 
   /**
-   * 添加动画每一帧的回调函数
+   * æ·»åŠ åŠ¨ç”»æ¯ä¸€å¸§çš„å›žè°ƒå‡½æ•°
    * @param  {Function} callback
    * @return {module:zrender/animation/Animator}
    */
@@ -35251,9 +35251,9 @@ Animator.prototype = {
   },
 
   /**
-   * 开始执行动画
+   * å¼€å§‹æ‰§è¡ŒåŠ¨ç”»
    * @param  {string|Function} [easing]
-   *         动画缓动函数，详见{@link module:zrender/animation/easing}
+   *         åŠ¨ç”»ç¼“åŠ¨å‡½æ•°ï¼Œè¯¦è§{@link module:zrender/animation/easing}
    * @param  {boolean} forceAnimate
    * @return {module:zrender/animation/Animator}
    */
@@ -35315,7 +35315,7 @@ Animator.prototype = {
   },
 
   /**
-   * 停止动画
+   * åœæ­¢åŠ¨ç”»
    * @param {boolean} forwardToLast If move to last frame before stop
    */
   stop: function (forwardToLast) {
@@ -35337,8 +35337,8 @@ Animator.prototype = {
   },
 
   /**
-   * 设置动画延迟开始的时间
-   * @param  {number} time 单位ms
+   * è®¾ç½®åŠ¨ç”»å»¶è¿Ÿå¼€å§‹çš„æ—¶é—´
+   * @param  {number} time å•ä½ms
    * @return {module:zrender/animation/Animator}
    */
   delay: function (time) {
@@ -35347,7 +35347,7 @@ Animator.prototype = {
   },
 
   /**
-   * 添加动画结束的回调
+   * æ·»åŠ åŠ¨ç”»ç»“æŸçš„å›žè°ƒ
    * @param  {Function} cb
    * @return {module:zrender/animation/Animator}
    */
@@ -35376,12 +35376,12 @@ module.exports = _default;
 var easingFuncs = __webpack_require__(144);
 
 /**
- * 动画主控制器
- * @config target 动画对象，可以是数组，如果是数组的话会批量分发onframe等事件
- * @config life(1000) 动画时长
- * @config delay(0) 动画延迟时间
+ * åŠ¨ç”»ä¸»æŽ§åˆ¶å™¨
+ * @config target åŠ¨ç”»å¯¹è±¡ï¼Œå¯ä»¥æ˜¯æ•°ç»„ï¼Œå¦‚æžœæ˜¯æ•°ç»„çš„è¯ä¼šæ‰¹é‡åˆ†å‘onframeç­‰äº‹ä»¶
+ * @config life(1000) åŠ¨ç”»æ—¶é•¿
+ * @config delay(0) åŠ¨ç”»å»¶è¿Ÿæ—¶é—´
  * @config loop(true)
- * @config gap(0) 循环的间隔时间
+ * @config gap(0) å¾ªçŽ¯çš„é—´éš”æ—¶é—´
  * @config onframe
  * @config easing(optional)
  * @config ondestroy(optional)
@@ -35390,14 +35390,14 @@ var easingFuncs = __webpack_require__(144);
  * TODO pause
  */
 function Clip(options) {
-  this._target = options.target; // 生命周期
+  this._target = options.target; // ç”Ÿå‘½å‘¨æœŸ
 
-  this._life = options.life || 1000; // 延时
+  this._life = options.life || 1000; // å»¶æ—¶
 
-  this._delay = options.delay || 0; // 开始时间
-  // this._startTime = new Date().getTime() + this._delay;// 单位毫秒
+  this._delay = options.delay || 0; // å¼€å§‹æ—¶é—´
+  // this._startTime = new Date().getTime() + this._delay;// å•ä½æ¯«ç§’
 
-  this._initialized = false; // 是否循环
+  this._initialized = false; // æ˜¯å¦å¾ªçŽ¯
 
   this.loop = options.loop == null ? false : options.loop;
   this.gap = options.gap || 0;
@@ -35424,7 +35424,7 @@ Clip.prototype = {
       return;
     }
 
-    var percent = (globalTime - this._startTime - this._pausedTime) / this._life; // 还没开始
+    var percent = (globalTime - this._startTime - this._pausedTime) / this._life; // è¿˜æ²¡å¼€å§‹
 
     if (percent < 0) {
       return;
@@ -35434,16 +35434,16 @@ Clip.prototype = {
     var easing = this.easing;
     var easingFunc = typeof easing == 'string' ? easingFuncs[easing] : easing;
     var schedule = typeof easingFunc === 'function' ? easingFunc(percent) : percent;
-    this.fire('frame', schedule); // 结束
+    this.fire('frame', schedule); // ç»“æŸ
 
     if (percent == 1) {
       if (this.loop) {
-        this.restart(globalTime); // 重新开始周期
-        // 抛出而不是直接调用事件直到 stage.update 后再统一调用这些事件
+        this.restart(globalTime); // é‡æ–°å¼€å§‹å‘¨æœŸ
+        // æŠ›å‡ºè€Œä¸æ˜¯ç›´æŽ¥è°ƒç”¨äº‹ä»¶ç›´åˆ° stage.update åŽå†ç»Ÿä¸€è°ƒç”¨è¿™äº›äº‹ä»¶
 
         return 'restart';
-      } // 动画完成将这个控制器标识为待删除
-      // 在Animation.update中进行批量删除
+      } // åŠ¨ç”»å®Œæˆå°†è¿™ä¸ªæŽ§åˆ¶å™¨æ ‡è¯†ä¸ºå¾…åˆ é™¤
+      // åœ¨Animation.updateä¸­è¿›è¡Œæ‰¹é‡åˆ é™¤
 
 
       this._needsRemove = true;
@@ -35480,7 +35480,7 @@ module.exports = _default;
 /***/ (function(module, exports) {
 
 /**
- * 缓动代码来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
+ * ç¼“åŠ¨ä»£ç æ¥è‡ª https://github.com/sole/tween.js/blob/master/src/Tween.js
  * @see http://sole.github.io/tween.js/examples/03_graphs.html
  * @exports zrender/animation/easing
  */
@@ -35520,7 +35520,7 @@ var easing = {
 
     return -0.5 * (--k * (k - 2) - 1);
   },
-  // 三次方的缓动（t^3）
+  // ä¸‰æ¬¡æ–¹çš„ç¼“åŠ¨ï¼ˆt^3ï¼‰
 
   /**
   * @param {number} k
@@ -35549,7 +35549,7 @@ var easing = {
 
     return 0.5 * ((k -= 2) * k * k + 2);
   },
-  // 四次方的缓动（t^4）
+  // å››æ¬¡æ–¹çš„ç¼“åŠ¨ï¼ˆt^4ï¼‰
 
   /**
   * @param {number} k
@@ -35578,7 +35578,7 @@ var easing = {
 
     return -0.5 * ((k -= 2) * k * k * k - 2);
   },
-  // 五次方的缓动（t^5）
+  // äº”æ¬¡æ–¹çš„ç¼“åŠ¨ï¼ˆt^5ï¼‰
 
   /**
   * @param {number} k
@@ -35607,7 +35607,7 @@ var easing = {
 
     return 0.5 * ((k -= 2) * k * k * k * k + 2);
   },
-  // 正弦曲线的缓动（sin(t)）
+  // æ­£å¼¦æ›²çº¿çš„ç¼“åŠ¨ï¼ˆsin(t)ï¼‰
 
   /**
   * @param {number} k
@@ -35632,7 +35632,7 @@ var easing = {
   sinusoidalInOut: function (k) {
     return 0.5 * (1 - Math.cos(Math.PI * k));
   },
-  // 指数曲线的缓动（2^t）
+  // æŒ‡æ•°æ›²çº¿çš„ç¼“åŠ¨ï¼ˆ2^tï¼‰
 
   /**
   * @param {number} k
@@ -35669,7 +35669,7 @@ var easing = {
 
     return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
   },
-  // 圆形曲线的缓动（sqrt(1-t^2)）
+  // åœ†å½¢æ›²çº¿çš„ç¼“åŠ¨ï¼ˆsqrt(1-t^2)ï¼‰
 
   /**
   * @param {number} k
@@ -35698,7 +35698,7 @@ var easing = {
 
     return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
   },
-  // 创建类似于弹簧在停止前来回振荡的动画
+  // åˆ›å»ºç±»ä¼¼äºŽå¼¹ç°§åœ¨åœæ­¢å‰æ¥å›žæŒ¯è¡çš„åŠ¨ç”»
 
   /**
   * @param {number} k
@@ -35784,7 +35784,7 @@ var easing = {
 
     return a * Math.pow(2, -10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p) * 0.5 + 1;
   },
-  // 在某一动画开始沿指示的路径进行动画处理前稍稍收回该动画的移动
+  // åœ¨æŸä¸€åŠ¨ç”»å¼€å§‹æ²¿æŒ‡ç¤ºçš„è·¯å¾„è¿›è¡ŒåŠ¨ç”»å¤„ç†å‰ç¨ç¨æ”¶å›žè¯¥åŠ¨ç”»çš„ç§»åŠ¨
 
   /**
   * @param {number} k
@@ -35817,7 +35817,7 @@ var easing = {
 
     return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
   },
-  // 创建弹跳效果
+  // åˆ›å»ºå¼¹è·³æ•ˆæžœ
 
   /**
   * @param {number} k
@@ -36800,44 +36800,44 @@ var defaultOption = {
     show: true,
 
     grid3DIndex: 0,
-    // 反向坐标轴
+    // åå‘åæ ‡è½´
     inverse: false,
 
-    // 坐标轴名字
+    // åæ ‡è½´åå­—
     name: '',
-    // 坐标轴名字位置
+    // åæ ‡è½´åå­—ä½ç½®
     nameLocation: 'middle',
 
     nameTextStyle: {
         fontSize: 16
     },
-    // 文字与轴线距离
+    // æ–‡å­—ä¸Žè½´çº¿è·ç¦»
     nameGap: 20,
 
     axisPointer: {},
 
     axisLine: {},
-    // 坐标轴小标记
+    // åæ ‡è½´å°æ ‡è®°
     axisTick: {},
     axisLabel: {},
-    // 分隔区域
+    // åˆ†éš”åŒºåŸŸ
     splitArea: {}
 };
 
 var categoryAxis = __WEBPACK_IMPORTED_MODULE_0_echarts_lib_echarts___default.a.util.merge({
-    // 类目起始和结束两端空白策略
+    // ç±»ç›®èµ·å§‹å’Œç»“æŸä¸¤ç«¯ç©ºç™½ç­–ç•¥
     boundaryGap: true,
     // splitArea: {
         // show: false
     // },
-    // 坐标轴小标记
+    // åæ ‡è½´å°æ ‡è®°
     axisTick: {
         // If tick is align with label when boundaryGap is true
         // Default with axisTick
         alignWithLabel: false,
         interval: 'auto'
     },
-    // 坐标轴文本标签，详见axis.axisLabel
+    // åæ ‡è½´æ–‡æœ¬æ ‡ç­¾ï¼Œè¯¦è§axis.axisLabel
     axisLabel: {
         interval: 'auto'
     },
@@ -36849,15 +36849,15 @@ var categoryAxis = __WEBPACK_IMPORTED_MODULE_0_echarts_lib_echarts___default.a.u
 }, defaultOption);
 
 var valueAxis = __WEBPACK_IMPORTED_MODULE_0_echarts_lib_echarts___default.a.util.merge({
-    // 数值起始和结束两端空白策略
+    // æ•°å€¼èµ·å§‹å’Œç»“æŸä¸¤ç«¯ç©ºç™½ç­–ç•¥
     boundaryGap: [0, 0],
-    // 最小值, 设置成 'dataMin' 则从数据中计算最小值
+    // æœ€å°å€¼, è®¾ç½®æˆ 'dataMin' åˆ™ä»Žæ•°æ®ä¸­è®¡ç®—æœ€å°å€¼
     // min: null,
-    // 最大值，设置成 'dataMax' 则从数据中计算最大值
+    // æœ€å¤§å€¼ï¼Œè®¾ç½®æˆ 'dataMax' åˆ™ä»Žæ•°æ®ä¸­è®¡ç®—æœ€å¤§å€¼
     // max: null,
-    // 脱离0值比例，放大聚焦到最终_min，_max区间
+    // è„±ç¦»0å€¼æ¯”ä¾‹ï¼Œæ”¾å¤§èšç„¦åˆ°æœ€ç»ˆ_minï¼Œ_maxåŒºé—´
     // scale: false,
-    // 分割段数，默认为5
+    // åˆ†å‰²æ®µæ•°ï¼Œé»˜è®¤ä¸º5
     splitNumber: 5,
     // Minimum interval
     // minInterval: null
@@ -39032,7 +39032,7 @@ var numberUtil = __webpack_require__(85);
 */
 
 /**
- * 每三位默认加,格式化
+ * æ¯ä¸‰ä½é»˜è®¤åŠ ,æ ¼å¼åŒ–
  * @param {string|number} x
  * @return {string}
  */
@@ -39513,12 +39513,12 @@ function prepareTruncateOptions(containerWidth, font, ellipsis, options) {
   var minChar = options.minChar = retrieve2(options.minChar, 0); // FIXME
   // Other languages?
 
-  options.cnCharWidth = getWidth('国', font); // FIXME
+  options.cnCharWidth = getWidth('å›½', font); // FIXME
   // Consider proportional font?
 
   var ascCharWidth = options.ascCharWidth = getWidth('a', font);
   options.placeholder = retrieve2(options.placeholder, ''); // Example 1: minChar: 3, text: 'asdfzxcv', truncate result: 'asdf', but not: 'a...'.
-  // Example 2: minChar: 3, text: '维度', truncate result: '维', but not: '...'.
+  // Example 2: minChar: 3, text: 'ç»´åº¦', truncate result: 'ç»´', but not: '...'.
 
   var contentWidth = containerWidth = Math.max(0, containerWidth - 1); // Reserve some gap.
 
@@ -39594,7 +39594,7 @@ function estimateLength(text, contentWidth, ascCharWidth, cnCharWidth) {
 
 function getLineHeight(font) {
   // FIXME A rough approach.
-  return getWidth('国', font);
+  return getWidth('å›½', font);
 }
 /**
  * @public
@@ -45089,13 +45089,13 @@ var zrUtil = __webpack_require__(13);
 * under the License.
 */
 var coordsOffsetMap = {
-  '南海诸岛': [32, 80],
-  // 全国
-  '广东': [0, -10],
-  '香港': [10, 5],
-  '澳门': [-10, 10],
-  //'北京': [-10, 0],
-  '天津': [5, 5]
+  'å—æµ·è¯¸å²›': [32, 80],
+  // å…¨å›½
+  'å¹¿ä¸œ': [0, -10],
+  'é¦™æ¸¯': [10, 5],
+  'æ¾³é—¨': [-10, 10],
+  //'åŒ—äº¬': [-10, 0],
+  'å¤©æ´¥': [5, 5]
 };
 
 function _default(geo) {
@@ -48648,7 +48648,7 @@ __WEBPACK_IMPORTED_MODULE_1__util_graphicGL__["a" /* default */].Shader.import(_
 /***/ (function(module, exports) {
 
 /**
- * 线段包含判断
+ * çº¿æ®µåŒ…å«åˆ¤æ–­
  * @param  {number}  x0
  * @param  {number}  y0
  * @param  {number}  x1
@@ -52199,7 +52199,7 @@ function generateNodeKey(id) {
 
 var Graph = function (directed) {
   /**
-   * 是否是有向图
+   * æ˜¯å¦æ˜¯æœ‰å‘å›¾
    * @type {boolean}
    * @private
    */
@@ -52606,7 +52606,7 @@ Node.prototype = {
   }
 };
 /**
- * 图边
+ * å›¾è¾¹
  * @alias module:echarts/data/Graph.Edge
  * @param {module:echarts/data/Graph.Node} n1
  * @param {module:echarts/data/Graph.Node} n2
@@ -52615,12 +52615,12 @@ Node.prototype = {
 
 function Edge(n1, n2, dataIndex) {
   /**
-   * 节点1，如果是有向图则为源节点
+   * èŠ‚ç‚¹1ï¼Œå¦‚æžœæ˜¯æœ‰å‘å›¾åˆ™ä¸ºæºèŠ‚ç‚¹
    * @type {module:echarts/data/Graph.Node}
    */
   this.node1 = n1;
   /**
-   * 节点2，如果是有向图则为目标节点
+   * èŠ‚ç‚¹2ï¼Œå¦‚æžœæ˜¯æœ‰å‘å›¾åˆ™ä¸ºç›®æ ‡èŠ‚ç‚¹
    * @type {module:echarts/data/Graph.Node}
    */
 
@@ -55104,7 +55104,7 @@ function forceAtlas2Worker() {
         var globalSpeed = this.jitterTolerence * this.jitterTolerence
                         * tractionWeightedSum / swingWeightedSum;
         // NB: During our tests we observed that an excessive rise of the global speed could have a negative impact.
-        // That’s why we limited the increase of global speed s(t)(G) to 50% of the previous step s(t−1)(G).
+        // Thatâ€™s why we limited the increase of global speed s(t)(G) to 50% of the previous step s(tâˆ’1)(G).
         if (this._globalSpeed > 0) {
             globalSpeed = Math.min(globalSpeed / this._globalSpeed, 1.5) * this._globalSpeed;
         }
@@ -55572,7 +55572,7 @@ var Roam2DControl = __WEBPACK_IMPORTED_MODULE_0_claygl_src_core_Base__["a" /* de
 
 
 
-// TODO 百度地图不是 linear 的
+// TODO ç™¾åº¦åœ°å›¾ä¸æ˜¯ linear çš„
 __WEBPACK_IMPORTED_MODULE_0_echarts_lib_echarts___default.a.extendChartView({
 
     type: 'flowGL',

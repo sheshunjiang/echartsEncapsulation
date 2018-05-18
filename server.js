@@ -13,8 +13,8 @@ var server = http.createServer(function(req,res){
      //url.parse()方法将一个URL字符串转换成对象并返回，通过pathname来访问此url的地址。
 
     // var realPath = path.join('D:/myFile/echarts封装/echartsEncapsulation/html',pathname);
-     var realPath = path.join('D:/myFile/echarts封装/echartsEncapsulation/',pathname);
-    //var realPath = path.join('D:/GitHub/echartsEncapsulation/',pathname);
+    var realPath = path.join('D:/myFile/echarts封装/echartsEncapsulation/',pathname);
+    //var realPath = path.join('D:/GitHub/echart/echartsEncapsulation/',pathname);
     //完整的url路径
     console.log(realPath);  
     // F:/nodejs/nodetest/index.html

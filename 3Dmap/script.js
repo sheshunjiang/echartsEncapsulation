@@ -4,6 +4,7 @@ function mapEcharts(ele,echarts,type){
 	this.echarts=echarts;
 	this.chart;
 	this.type=type;
+	this.disable=false;     //禁止绘画
 }
 
 mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
@@ -22,16 +23,17 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 		options={
 			backgroundColor: option.backgroundColor? option.backgroundColor:"#ffffff",
 			geo3D: {
-		       map: mapName,
+		       map: regionName,
 		       roam: true,
 		       itemStyle: {
 		           opacity: 1,
 		           borderWidth: 0.4,
+		           areaColor: option.areaColor ? option.areaColor : '#99ff99',
 		           color: option.areaColor ? option.areaColor : '#99ff99',
 				   borderColor: option.borderColor ? option.borderColor : '#111'
 		       },
 		       label: {
-		           show: false,
+		           show: true,
 		           textStyle:{
                         color:option.textColor ? option.textColor : '#000',
                         fontWeight : 'normal',
@@ -42,48 +44,55 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 		        },
 		        emphasis: { //当鼠标放上去  地区区域是否显示名称
 		            itemStyle:{
-                   		color: option.hoverColor ? option.hoverColor : '#00CED1'
+                   		color: option.hoverColor ? option.hoverColor : '#00CED1',
+                   		areaColor:option.hoverColor ? option.hoverColor : '#00CED1',
                    }
 		        },
+		        viewControl: {
+	                autoRotate: false,
+	                //distance: 100,
+	                //maxDistance:150,
+	                minDistance:100
+	            },
 		        regions:option.regionsData
 		    },
-		    series:[
-				{
-					name:regionName,
-	                type : "map3D",
-	                map:regionName,
-	                geo3DIndex:0,
-	                zlevel:-9,
-	                label:{
-	                   show:true,
-	                   textStyle:{
-	                        color:option.textColor ? option.textColor : '#000',
-	                        fontWeight : 'normal',
-	                        fontFamily:'sans-serif',
-	                        fontSize : 12,
-	                        backgroundColor: 'rgba(0,23,11,0)'
-	                    },
-	                     emphasis: {//对应的鼠标悬浮效果
-	                        show: true,
-	                    } 
-	                },
-	                itemStyle:{
-	                	borderWidth:0.4,
-				       	color: option.areaColor ? option.areaColor : '#99ff99',
-				       	borderColor: option.borderColor ? option.borderColor : '#111',
-	                },
-	                emphasis: {
-	                   itemStyle:{
-	                   		color: option.hoverColor ? option.hoverColor : '#00CED1'
-	                   }
-	                },
-	                viewControl: {
-	                    autoRotate: false
-	                    //distance: 70
-	                },
-	                data : option.seriesData
-	            }
-			],
+		 //    series:[
+			// 	{
+			// 		name:regionName,
+	  //               type : "map3D",
+	  //               map:regionName,
+	  //               geo3DIndex:0,
+	  //               zlevel:-9,
+	  //               label:{
+	  //                  show:true,
+	  //                  textStyle:{
+	  //                       color:option.textColor ? option.textColor : '#000',
+	  //                       fontWeight : 'normal',
+	  //                       fontFamily:'sans-serif',
+	  //                       fontSize : 12,
+	  //                       backgroundColor: 'rgba(0,23,11,0)'
+	  //                   },
+	  //                    emphasis: {//对应的鼠标悬浮效果
+	  //                       show: true,
+	  //                   } 
+	  //               },
+	  //               itemStyle:{
+	  //               	borderWidth:0.4,
+			// 	       	color: option.areaColor ? option.areaColor : '#99ff99',
+			// 	       	borderColor: option.borderColor ? option.borderColor : '#111',
+	  //               },
+	  //               emphasis: {
+	  //                  itemStyle:{
+	  //                  		color: option.hoverColor ? option.hoverColor : '#00CED1'
+	  //                  }
+	  //               },
+	  //               viewControl: {
+	  //                   autoRotate: false
+	  //                   //distance: 70
+	  //               },
+	  //               data : option.seriesData
+	  //           }
+			// ],
 			animation:true
 		};
 	}else{
@@ -142,6 +151,7 @@ mapEcharts.prototype.DropMapGeo=function(mapName,geoJsonData,option,callback){
 	if(callback){
 		callback();
 	}
+	console.log(chart.getOption());
 	return this;
 }
 //查找指定行政块数据所在指定地图中的相关信息
@@ -211,15 +221,26 @@ mapEcharts.prototype.setMapColor=function(params,color){
 	var option=this.chart.getOption();
 	var type="map";
 	if(this.type){
-		type=type+this.type;
-	}
-	for(var i=0;i<option.series.length;i++){
-		if(option.series[i].type==type && option.series[i].name==params.mapName && option.series[i].data[params.dataIndex].id==params.id &&
-		 option.series[i].data[params.dataIndex].name==params.name){
-			if(!option.series[i].data[params.dataIndex].itemStyle){
-				option.series[i].data[params.dataIndex].itemStyle={color:''};
+		//type=type+this.type;
+		for(var i=0;i<option.geo3D[0].regions.length;i++){
+			if(option.geo3D[0].regions[i].name==params.name){
+				if(!option.geo3D[0].regions[i].itemStyle){
+					option.geo3D[0].regions[i].itemStyle={color:''};
+				}
+				option.geo3D[0].regions[i].itemStyle.color=color;
+				option.geo3D[0].regions[i].itemStyle.areaColor=color;
+				break;
 			}
-			option.series[i].data[params.dataIndex].itemStyle.color=color;
+		}
+	}else{
+		for(var i=0;i<option.series.length;i++){
+			if(option.series[i].type==type && option.series[i].name==params.mapName && option.series[i].data[params.dataIndex].id==params.id &&
+			 option.series[i].data[params.dataIndex].name==params.name){
+				if(!option.series[i].data[params.dataIndex].itemStyle){
+					option.series[i].data[params.dataIndex].itemStyle={color:''};
+				}
+				option.series[i].data[params.dataIndex].itemStyle.color=color;
+			}
 		}
 	}
 	this.chart.setOption(option);
@@ -239,27 +260,29 @@ mapEcharts.prototype.setMapColor=function(params,color){
 // 	color:,        //颜色
 // }
 mapEcharts.prototype.setMapText=function(params,textStyle){
+	console.log(params);
 	var option=this.chart.getOption();
 	var type="map"+this.type;
 	if(this.type){
-		for(var i=0; i<option.series.length;i++){
-			if(option.series[i].type==type && option.series[i].name==params.mapName && option.series[i].data[params.dataIndex].id==params.id &&
-			 option.series[i].data[params.dataIndex].name==params.name){
-				if(!option.series[i].data[params.dataIndex].label){
-					option.series[i].data[params.dataIndex].label={
+		for(var i=0;i<option.geo3D[0].regions.length;i++){
+			if(option.geo3D[0].regions[i].name==params.name){
+				if(!option.geo3D[0].regions[i].label){
+					option.geo3D[0].regions[i].label={
 						show:true,
 						textStyle:{
 							fontFamily:'',
-							fontSize:'',
+							fontSize:12,
 							fontWeight:'',
+							fontStyle:'',
 							color:''
 						}
 					};
 				}
-				option.series[i].data[params.dataIndex].label.textStyle.fontFamily=textStyle.fontFamily;
-				option.series[i].data[params.dataIndex].label.textStyle.fontSize=textStyle.fontSize;
-				option.series[i].data[params.dataIndex].label.textStyle.fontWeight=textStyle.fontWeight;
-				option.series[i].data[params.dataIndex].label.textStyle.color=textStyle.color;
+				option.geo3D[0].regions[i].label.textStyle.fontFamily=textStyle.fontFamily;
+				option.geo3D[0].regions[i].label.textStyle.fontSize=textStyle.fontSize;
+				option.geo3D[0].regions[i].label.textStyle.fontWeight=textStyle.fontWeight;
+				option.geo3D[0].regions[i].label.textStyle.fontStyle=textStyle.fontStyle;
+				option.geo3D[0].regions[i].label.textStyle.color=textStyle.color;
 			}
 		}
 	}else{
@@ -283,6 +306,7 @@ mapEcharts.prototype.setMapText=function(params,textStyle){
 		}
 	}
 	this.chart.setOption(option);
+	console.log(this.chart.getOption());
 }
 
 
@@ -297,10 +321,10 @@ mapEcharts.prototype.setMapText=function(params,textStyle){
 // 	width:1,			//宽,默认宽1
 // 	type:"solid",		//类型 默认soild
 // 	opacity:0.6		//透明度 默认值0.6
+//  curveness:0      //线的曲率，默认为0
 // }
 // isShowSpot:true  是否显示线段拐点，true显示，false 不显示，不传入此参数默认不显示
 mapEcharts.prototype.setDropLines=function(lineName,linesData,lineOption,isShowSpot){
-	console.log(linesData);
 	var linesArr=[];
 	var markPointData=[];
 	for(var i=0;i<linesData.length;i++){
@@ -318,16 +342,23 @@ mapEcharts.prototype.setDropLines=function(lineName,linesData,lineOption,isShowS
 					"color": lineOption && lineOption.color ? lineOption.color : "#fff",
 					"width":lineOption && lineOption.width ? lineOption.width : 1,
 					"type":lineOption && lineOption.type ? lineOption.type : "solid",
-					"opacity":lineOption && lineOption.opacity ? lineOption.opacity : 0.6
+					"opacity":lineOption ? lineOption.opacity : 0.6
 				}
 			}
 		);
 	}
 	var option=this.chart.getOption();
+	var type="lines";
+	var coordinateSystem="geo";
+	if(this.type){
+		type=type+this.type;
+		coordinateSystem=coordinateSystem+this.type;
+	}
 	var item={
         name:lineName,
-        type: 'lines',
-        polyline:true,
+        type: type,
+        coordinateSystem: coordinateSystem,
+        //polyline:true,
         zlevel: 0,
         symbolSize: 10,
         data:linesArr,
@@ -338,6 +369,9 @@ mapEcharts.prototype.setDropLines=function(lineName,linesData,lineOption,isShowS
 				color:'#fff'
 			},
 			data:markPointData
+        },
+        lineStyle:{
+        	curveness:lineOption && lineOption.curveness ? lineOption.curveness:0
         }
 	};
 	option.series.push(item);
@@ -385,12 +419,23 @@ mapEcharts.prototype.setLineAnimation=function(trajectoryLine,lineAnimationOptio
 			coordsArr.push(trajectoryLine.data[i].coords[1]);
 		}
 	}
+	var polyline=true;
+	if(trajectoryLine.data.length==1){
+		polyline=false;
+	}
+	var type="lines";
+	var coordinateSystem="geo";
+	if(this.type){
+		type=type+this.type;
+		coordinateSystem=coordinateSystem+this.type;
+	}
 	var item={
         name: trajectoryLine.name + 'Animation',
-        type: 'lines',
-        polyline:true,
+        type: type,
+        coordinateSystem:coordinateSystem,
+        polyline:polyline,
+        //blendMode: 'lighter',
         zlevel:Math.random()*10,
-        //zlevel: Math.round(Math.random()*100),
         effect: {
             show: isStartUp ? isStartUp : true,
             period: lineAnimationOption ? lineAnimationOption.period : 6,
@@ -400,12 +445,15 @@ mapEcharts.prototype.setLineAnimation=function(trajectoryLine,lineAnimationOptio
 			color: lineAnimationOption ? lineAnimationOption.color : '#fff',		 
 			symbolSize: lineAnimationOption ? lineAnimationOption.symbolSize : 3,         
 			trailLength: lineAnimationOption ? lineAnimationOption.trailLength : 0.2,      
-			loop:lineAnimationOption ? lineAnimationOption.loop : true,       
+			loop:lineAnimationOption ? lineAnimationOption.loop : true,
+			trailWidth: lineAnimationOption ? lineAnimationOption.symbolSize : 3,
+			trailColor: lineAnimationOption ? lineAnimationOption.color : '#fff'
         },
         lineStyle: {
             normal: {
                 width: 0,
-                opacity:0.6
+                opacity:0.6,
+                curveness:!polyline && trajectoryLine.lineStyle.curveness ? trajectoryLine.lineStyle.curveness:0
             }
         },
         data: [
@@ -420,6 +468,7 @@ mapEcharts.prototype.setLineAnimation=function(trajectoryLine,lineAnimationOptio
     }
 	option.series.push(item);
 	this.chart.setOption(option);
+	console.log(this.chart.getOption());
 	return item;
 }
 
@@ -497,6 +546,12 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
 	var option=this.chart.getOption();
 	var seriesData=[];
 	var itemSeries=[];
+	var type="scatter";
+	var coordinateSystem="geo";
+	if(this.type){
+		type=type+this.type;
+		coordinateSystem=coordinateSystem+this.type;
+	}
 	for(var i=0;i<spotData.length;i++){
 		seriesData.push(
 			{
@@ -521,26 +576,29 @@ mapEcharts.prototype.setDropSpot=function(spotsName,spotData,spotOption){
 		);
 		itemSeries.push({
 			seriesName: spotsName,
-        	seriesType: 'scatter',
+        	seriesType: type,
         	data: seriesData[i],
         	dataIndex:i
 		});
 	}
 	option.series.push({
 		name: spotsName,
-        type: 'scatter',
-        coordinateSystem: 'geo',
+        type: type,
+        coordinateSystem: coordinateSystem,
         data: seriesData,
 		symbol:"circle",
         symbolSize: 12,
         hoverAnimation:false,
-        zlevel:0,
+        //zlevel:0,
         label: {
             normal: {
                 show: true
             },
             emphasis: {
                 show: false
+            },
+            textStyle:{
+            	backgroundColor: 'rgba(0,23,11,0)'
             }
         }
 	});
@@ -558,8 +616,12 @@ mapEcharts.prototype.setSpotText=function(params,text,textOption){
 	if( isNaN(textOption.offset[0]) || isNaN(textOption.offset[0])){
 		falg=false;
 	}
+	var type="scatter";
+	if(this.type){
+		type=type+this.type;
+	}
 	for(var i=0;i<option.series.length;i++){
-		if(option.series[i].name==params.seriesName && params.seriesType=="scatter"){ 
+		if(option.series[i].name==params.seriesName && params.seriesType==type){ 
 			if(text && text !=""){
 				option.series[i].data[params.dataIndex].name=text;
 			}
@@ -590,8 +652,12 @@ imgOption:{
 */
 mapEcharts.prototype.setSoptImg=function(params,imgOption){
 	var option=this.chart.getOption();
+	var type="scatter";
+	if(this.type){
+		type=type+this.type;
+	}
 	for(var i=0;i<option.series.length;i++){
-		if(option.series[i].name==params.seriesName && params.seriesType=="scatter"){
+		if(option.series[i].name==params.seriesName && params.seriesType==type){
 			if(imgOption.symbol){
 				option.series[i].data[params.dataIndex].symbol=imgOption.symbol;
 			}
@@ -610,9 +676,13 @@ mapEcharts.prototype.setSoptImg=function(params,imgOption){
 //清除点
 mapEcharts.prototype.clearSpot=function(params){
 	var option=this.chart.getOption();
+	var type="scatter";
+	if(this.type){
+		type=type+this.type;
+	}
 	for(var i=0;i<option.series.length;i++){
 		for(var j=0;j<params.length;j++){
-			if(option.series[i].name==params[j].seriesName && params[j].seriesType=="scatter"){
+			if(option.series[i].name==params[j].seriesName && params[j].seriesType==type){
 				for(var k=0;k<option.series[i].data.length;k++){
 					if(option.series[i].data[k].name==params[j].data.name && option.series[i].data[k].name==params[j].data.name){
 						option.series[i].data.splice(k,1);
@@ -639,13 +709,15 @@ mapEcharts.prototype.clearAll=function(){
 			i-=1;
 		}
 	}
-	//delete option.graphic;
+	delete option.graphic;
+	this.disable=true;
 	this.chart.setOption(option,true);
 }
 
 //监听事件
 mapEcharts.prototype.linster=function(eventName,callback){
      this.chart.on(eventName,function(params){
+     	//console.log(eventName);
      	var param={};
      	if(params.seriesType=="scatter"){
      		param.data=params.data;
@@ -719,10 +791,16 @@ mapEcharts.prototype.overlyScatter=function(scatterName,scatterData,scatterOptio
 	    	option.visualMap=item;
 		}
     }
+    var type="scatter";
+    var coordinateSystem="geo";
+	if(this.type){
+		type=type+this.type;
+		coordinateSystem=coordinateSystem+this.type;
+	}
 	option.series.push({
 		 name: scatterName,
-         type: 'scatter',
-         coordinateSystem: 'geo',
+         type: type,
+         coordinateSystem: coordinateSystem,
          symbol:scatterOption.symbol ? scatterOption.symbol:'circle',
          symbolSize: symbolSize,
          itemStyle:{
@@ -737,6 +815,7 @@ mapEcharts.prototype.overlyScatter=function(scatterName,scatterData,scatterOptio
          data:data
 	});
 	this.chart.setOption(option);
+	console.log(this.chart.getOption());
 }
 
 //叠加柱状图
@@ -760,6 +839,9 @@ mapEcharts.prototype.overlyBarChart=function(barName,geoData,barData,barOption){
 	var throttledRenderEachCity = throttle(renderEachCity, 0);
 	this.chart.on('geoRoam',throttledRenderEachCity);
 	function renderEachCity(){
+		if(that.disable){
+			return;
+		}
 		var option={
 			xAxis:[],
 			yAxis:[],
@@ -789,6 +871,7 @@ mapEcharts.prototype.overlyBarChart=function(barName,geoData,barData,barOption){
 	                show: false
 	            },
 	            axisLine: {
+	            	show: false,
 	                onZero: false,
 	                lineStyle: {
 	                    color: '#666'
@@ -832,6 +915,7 @@ mapEcharts.prototype.overlyBarChart=function(barName,geoData,barData,barOption){
 	            height: height,
 	            left: left,
 	            top:top,
+	            show: false,
 	            z: 2
 	        });
 	        option.series.push({
@@ -879,6 +963,67 @@ mapEcharts.prototype.overlyBarChart=function(barName,geoData,barData,barOption){
 	}
 }
 
+//叠加3D柱状图
+/*
+barName:''   柱状图名称
+geoData:{"榆林市":[109.1162, 32.7722],"延安市":[109.1052, 36.4252]}    //地理数据{城市名：地理坐标}
+barData:[{"name":"榆林市",value:100},{"name":"延安市",value:150}]       //3D柱状图数据
+barOption:{    //柱状图参数
+	bevelSize:0.3     //柱子的倒角尺寸，取值0-1 默认为0
+	bevelSmoothness:2   //柱子的光滑度，数值越大越光滑/圆润。
+	color:'#FF00FF',  //柱子颜色颜色，
+}
+colorDynamic:{         //是否根据value值动态改变图标的颜色 ，出入此参数barOption中的color无效
+	isDynamicColor:true,    //true时，scatterOption.color无效
+	color:['#9A32CD','#71C671','#0000FF'],   //颜色数组
+	min:0,                 //最小值
+	max:350                //最大值
+}
+*/
+mapEcharts.prototype.overlyBarChart3D=function(barName,geoData,barData,barOption,colorDynamic){
+	var option=this.chart.getOption();
+	var data=[];
+	for(var i=0;i<barData.length;i++){
+		data.push({
+			"name":barData[i].name,
+			"value":geoData[barData[i].name].concat(barData[i].value)
+		});
+	}
+	if(colorDynamic && colorDynamic.isDynamicColor){
+    	var item={
+    		show:false,
+			min: colorDynamic.min ? colorDynamic.min : 0,
+			max: colorDynamic.max ? colorDynamic.max : 100,
+			calculable: false,
+			seriesIndex:option.series.length,
+			inRange: {
+				color:colorDynamic.color ? colorDynamic.color :['#d94e5d','#eac736','#50a3ba']
+			}
+    	};
+    	if(option.visualMap){
+    		option.visualMap.push(item);
+    	}else{
+	    	option.visualMap=item;
+		}
+    }
+	option.series.push({
+		name:barName,
+		type:"bar3D",
+		coordinateSystem:"geo3D",
+		bevelSize:barOption ? barOption.bevelSize : 0,
+		bevelSmoothness:barOption ? barOption.bevelSmoothness:2,
+		label:{
+			formatter:function (params) {
+	            return params.name + ' : ' + params.value[2];}
+		},
+		itemStyle:{
+			color:barOption && barOption.color ? barOption.color : "ff0000", 
+		},
+		data:data
+	});
+	this.chart.setOption(option);
+}
+
 //叠加饼形图
 /*
 pieName:饼状图名称，不能有同名
@@ -891,6 +1036,7 @@ pineOption:{
 }
 */
 mapEcharts.prototype.overlyPieChart=function(pieName,geoData,pieData,pineOption){
+	var that=this;
 	var myChart=this.chart;
 	//var option=myChart.getOption();
 	var geoData=geoData;
@@ -901,6 +1047,9 @@ mapEcharts.prototype.overlyPieChart=function(pieName,geoData,pieData,pineOption)
 		throttledRenderEachCity();
 	});
 	function renderEachCityPie(){
+		if(that.disable){
+			return;
+		}
 		var option={
 			series:[]
 		};
@@ -1119,12 +1268,16 @@ imgOption:{   //图片参数
 }
 */
 mapEcharts.prototype.overlyImg=function(name,coords,imgOption){
+	var that=this;
 	var myChart=this.chart;
 	rendImg();
 	myChart.on("geoRoam",function(){
 		rendImg();
 	});
 	function rendImg(){
+		if(that.disable){
+			return;
+		}
 		var option=myChart.getOption();
 		var arr=myChart.convertToPixel('geo',coords);
 		if(!option.graphic){
@@ -1183,6 +1336,7 @@ mapEcharts.prototype.overlyBezierCurve=function(bazLineID,dazData,bazOption,grad
 	if(!bazLineID){
 		return;
 	}
+	var that=this;
 	var falg=false;  //鼠标是否缩放过
 	var myChart=this.chart;
 	var dazData=dazData;
@@ -1193,15 +1347,12 @@ mapEcharts.prototype.overlyBezierCurve=function(bazLineID,dazData,bazOption,grad
 	//var throttledRenderEachCity = throttle(dropBezierCurve, 0);
 	this.chart.on("geoRoam",function(params){
 		falg=true;
-		//console.log(params);
 		dropBezierCurve();
-		//throttledRenderEachCity();
-	});
-	myChart.on('click',function(params){
-		console.log(1);
-		console.log(params);
 	});
 	function dropBezierCurve(){
+		if(that.disable){
+			return;
+		}
 		var option=myChart.getOption();
 		data=[];
 		for(var i=0;i<arr.length;i++){
@@ -1522,6 +1673,28 @@ mapEcharts.prototype.setBaz=function(){
 	);
 	this.chart.setOption(option,true);
  }
+
+
+
+ //序列化
+ // mapEcharts.prototype.serializable=function(){
+ // 	var option=this.chart.getOption();
+ // 	//console.log(option);
+ // 	var data={
+ // 		"name":'she',
+ // 		"option":option,
+ // 		//"mapData":
+ // 		//"obj":this
+ // 	};
+ // 	console.log(JSON.stringify(data));
+ // 	//console.log(JSON.stringify(this));
+ // }
+ // //反序列化
+ // mapEcharts.prototype.deserialization=function(data){
+ // 	var option=data.option;
+ // 	chart=this.echarts.init(this.ele);
+ // 	chart.setOption(option);
+ // }
 
 
 
